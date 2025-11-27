@@ -7,130 +7,14 @@
     <title>My Portfolio</title>
     <link rel="stylesheet" href="style.css" />
     <link rel="stylesheet" href="mediaqueries.css" />
-    <style>
-      /* ---------------- THEME VARIABLES ---------------- */
-      :root{
-        --bg: #f7f7fb;
-        --surface: rgba(255,255,255,0.7);
-        --card-bg: rgba(255,255,255,0.6);
-        --text: #111827;
-        --muted: #475569;
-        --accent: #6d28d9;
-        --glass-border: rgba(255,255,255,0.6);
-      }
-      body.dark {
-        --bg: #071022;
-        --surface: rgba(10,18,28,0.62);
-        --card-bg: rgba(12,18,28,0.64);
-        --text: #e6eef8;
-        --muted: #99a9c6;
-        --accent: #8b5cf6;
-        --glass-border: rgba(255,255,255,0.04);
-      }
-
-      html,body{ height:100%; margin:0; font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial; background:var(--bg); color:var(--text); -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
-
-      a { color:var(--accent); }
-      .about-para { text-align:left; line-height:1.6; color:var(--muted); }
-
-      /* ---------------- THEME TOGGLE (fixed top-right) ---------------- */
-      #theme-toggle {
-        position: fixed;
-        top: 16px;
-        right: 16px;
-        z-index: 9999;
-        display:flex;
-        gap:8px;
-        align-items:center;
-        padding:6px;
-        border-radius:999px;
-        background: var(--surface);
-        border:1px solid var(--glass-border);
-        box-shadow: 0 8px 24px rgba(2,6,23,0.08);
-        backdrop-filter: blur(6px);
-      }
-      #theme-toggle .btn {
-        width:40px; height:40px; display:grid; place-items:center; border-radius:50%; border:none; background:transparent; cursor:pointer; font-size:18px;
-      }
-      #theme-toggle .btn.active { box-shadow: 0 6px 18px rgba(0,0,0,0.12); transform:scale(1.03); }
-
-      /* ---------------- PROJECT CARD: preserve size, hover only transforms ---------------- */
-      .color-container {
-        background: var(--card-bg);
-        border-radius:12px;
-        padding:18px;
-        border:1px solid var(--glass-border);
-        box-shadow: 0 8px 18px rgba(2,6,23,0.06);
-        transition: transform 280ms cubic-bezier(.2,.9,.2,1), box-shadow 280ms, filter 280ms;
-        transform-origin: center;
-        position: relative; /* needed for effort badge */
-        overflow: visible; /* keep badge visible */
-        /* DO NOT change width/height here — keeps your original layout / size */
-      }
-
-      /* On hover: visual lift only (dimensions unchanged) */
-      .color-container:hover,
-      .color-container:focus-within {
-        transform: translateY(-10px) scale(1.02);
-        box-shadow: 0 20px 40px rgba(2,6,23,0.18);
-      }
-
-      .project-img { width:100%; height:160px; object-fit:cover; border-radius:8px; display:block; }
-
-      /* ---------------- EFFORT BADGE ---------------- */
-      .effort-badge {
-        position: absolute;
-        left: 12px;
-        top: 12px;
-        background: linear-gradient(180deg, rgba(255,255,255,0.9), rgba(255,255,255,0.75));
-        color: #0b1220;
-        padding:6px 10px;
-        border-radius:999px;
-        font-weight:600;
-        font-size:13px;
-        border:1px solid rgba(0,0,0,0.06);
-        opacity:0;
-        transform: translateY(-6px);
-        transition: opacity 180ms ease, transform 220ms ease;
-        pointer-events:none;
-        white-space:nowrap;
-        z-index: 5;
-      }
-      body.dark .effort-badge {
-        background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02));
-        color: var(--text);
-        border:1px solid rgba(255,255,255,0.04);
-      }
-      /* show badge on hover or keyboard focus */
-      .color-container:hover .effort-badge,
-      .color-container:focus-within .effort-badge,
-      .color-container:focus .effort-badge {
-        opacity:1;
-        transform: translateY(0);
-      }
-
-      /* small accessibility focus outline for keyboard users */
-      .color-container:focus { outline: 3px solid rgba(139,92,246,0.14); outline-offset:6px; }
-
-      /* ensure project title/buttons remain visible */
-      .project-title { margin:12px 0 8px; color:var(--text); }
-      .project-btn { margin-right:8px; }
-
-      /* responsive adjustment for very small screens */
-      @media (max-width:480px) {
-        .project-img { height:140px; }
-        #theme-toggle { right:10px; top:10px; padding:4px; }
-      }
-    </style>
   </head>
+      <style>
+  .about-para {
+    text-align: left;
+    line-height: 1.6;
+  }
+</style>
   <body>
-    <!-- THEME TOGGLE (fixed) -->
-    <div id="theme-toggle" aria-hidden="false" role="toolbar" aria-label="Theme toggle">
-      <button id="toggle-light" class="btn" aria-pressed="false" title="Light mode">☀️</button>
-      <button id="toggle-dark" class="btn" aria-pressed="false" title="Dark mode">🌙</button>
-    </div>
-
-    <!-- ===== KEEP YOUR ORIGINAL NAV & CONTENT (unchanged) ===== -->
     <nav id="desktop-nav">
       <div class="logo">Desing Raju Chavvakula</div>
       <div>
@@ -158,7 +42,6 @@
         </div>
       </div>
     </nav>
-
     <section id="profile">
       <div class="section__pic-container">
         <img src="./assets/profile-pic.png" alt="John Doe profile picture" />
@@ -194,7 +77,6 @@
         </div>
       </div>
     </section>
-
     <section id="about">
       <p class="section__text__p1">Get To Know More</p>
       <h1 class="title">About Me</h1>
@@ -240,7 +122,6 @@
         onclick="location.href='./#experience'"
       />
     </section>
-
     <section id="experience">
       <p class="section__text__p1">Explore My</p>
       <h1 class="title">Experience</h1>
@@ -353,15 +234,12 @@
         onclick="location.href='./#projects'"
       />
     </section>
-
-    <!-- ===== PROJECTS: NOTE: each .color-container now has data-effort="..." ===== -->
     <section id="projects">
       <p class="section__text__p1">Browse My Recent</p>
       <h1 class="title">Projects</h1>
       <div class="experience-details-container">
         <div class="about-containers">
-          <div class="details-container color-container" data-effort="15 hrs">
-            <div class="effort-badge" aria-hidden="true"></div>
+          <div class="details-container color-container">
             <div class="article-container">
               <img
                 src="./assets/project-1.png"
@@ -385,9 +263,7 @@
               </button>
             </div>
           </div>
-
-          <div class="details-container color-container" data-effort="10 hrs">
-            <div class="effort-badge" aria-hidden="true"></div>
+          <div class="details-container color-container">
             <div class="article-container">
               <img
                 src="./assets/project-2.png"
@@ -411,9 +287,7 @@
               </button>
             </div>
           </div>
-
-          <div class="details-container color-container" data-effort="8 hrs">
-            <div class="effort-badge" aria-hidden="true"></div>
+          <div class="details-container color-container">
             <div class="article-container">
               <img
                 src="./assets/project-4.png"
@@ -437,9 +311,7 @@
               </button>
             </div>
           </div>
-
-          <div class="details-container color-container" data-effort="7 hrs">
-            <div class="effort-badge" aria-hidden="true"></div>
+          <div class="details-container color-container">
             <div class="article-container">
               <img
                 src="./assets/project-7.png"
@@ -463,9 +335,7 @@
               </button>
             </div>
           </div>
-
-          <div class="details-container color-container" data-effort="12 hrs">
-            <div class="effort-badge" aria-hidden="true"></div>
+          <div class="details-container color-container">
             <div class="article-container">
               <img
                 src="./assets/project-3.png"
@@ -489,7 +359,6 @@
               </button>
             </div>
           </div>
-
         </div>
       </div>
       <img
@@ -498,14 +367,13 @@
         class="icon arrow"
         onclick="location.href='./#contact'"
       />
-    </section>
-
-    <!-- (rest of your project sections preserved) -->
+      </section>
     <section>
+      <p class="section__text__p1"></p>
+      <h1 class="title"> </h1>
       <div class="experience-details-container">
         <div class="about-containers">
-          <div class="details-container color-container" data-effort="9 hrs">
-            <div class="effort-badge" aria-hidden="true"></div>
+          <div class="details-container color-container">
             <div class="article-container">
               <img
                 src="./assets/project-5.png"
@@ -529,9 +397,7 @@
               </button>
             </div>
           </div>
-
-          <div class="details-container color-container" data-effort="6 hrs">
-            <div class="effort-badge" aria-hidden="true"></div>
+          <div class="details-container color-container">
             <div class="article-container">
               <img
                 src="./assets/project-6.png"
@@ -554,10 +420,8 @@
                 Live Demo
               </button>
             </div>
-          </div>
-
-          <div class="details-container color-container" data-effort="18 hrs">
-            <div class="effort-badge" aria-hidden="true"></div>
+            </div>
+                <div class="details-container color-container">
             <div class="article-container">
               <img
                 src="./assets/project-8.png"
@@ -581,9 +445,7 @@
               </button>
             </div>
           </div>
-
-          <div class="details-container color-container" data-effort="11 hrs">
-            <div class="effort-badge" aria-hidden="true"></div>
+          <div class="details-container color-container">
             <div class="article-container">
               <img
                 src="./assets/project-10.png"
@@ -607,9 +469,7 @@
               </button>
             </div>
           </div>
-
-          <div class="details-container color-container" data-effort="5 hrs">
-            <div class="effort-badge" aria-hidden="true"></div>
+          <div class="details-container color-container">
             <div class="article-container">
               <img
                 src="./assets/project-9.png"
@@ -633,10 +493,8 @@
               </button>
             </div>
           </div>
-
         </div>
       </div>
-
       <img
         src="./assets/arrow.png"
         alt="Arrow icon"
@@ -644,7 +502,6 @@
         onclick="location.href='./#contact'"
       />
     </section>
-
     <section id="contact">
       <p class="section__text__p1">Get in Touch</p>
       <h1 class="title">Contact Me</h1>
@@ -667,7 +524,6 @@
         </div>
       </div>
     </section>
-
     <footer>
       <nav>
         <div class="nav-links-container">
@@ -681,61 +537,6 @@
       </nav>
       <p>Copyright &#169; 2025 Desing Raju. All Rights Reserved.</p>
     </footer>
-
-    <script src="script.js"></script> <!-- your existing script (kept) -->
-
-    <!-- ===== ADDED: theme + effort badge wiring ===== -->
-    <script>
-      (function(){
-        // THEME: reliable toggle + persistence
-        const btnLight = document.getElementById('toggle-light');
-        const btnDark = document.getElementById('toggle-dark');
-        const root = document.documentElement;
-        const body = document.body;
-
-        function applyTheme(theme){
-          if(theme === 'dark'){ body.classList.add('dark'); btnDark.classList.add('active'); btnLight.classList.remove('active'); btnDark.setAttribute('aria-pressed','true'); btnLight.setAttribute('aria-pressed','false'); }
-          else { body.classList.remove('dark'); btnLight.classList.add('active'); btnDark.classList.remove('active'); btnLight.setAttribute('aria-pressed','true'); btnDark.setAttribute('aria-pressed','false'); }
-          try { localStorage.setItem('portfolio-theme', theme); } catch(e){}
-        }
-
-        // Prefer saved -> system -> light
-        let saved = null;
-        try { saved = localStorage.getItem('portfolio-theme'); } catch(e){}
-        if(saved) applyTheme(saved);
-        else {
-          const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-          applyTheme(prefersDark ? 'dark' : 'light');
-        }
-
-        btnLight.addEventListener('click', ()=> applyTheme('light'));
-        btnDark.addEventListener('click', ()=> applyTheme('dark'));
-
-        // Allow pressing same button toggles for accessibility
-        document.addEventListener('keydown', (e) => {
-          if(e.key === 'd') applyTheme('dark');
-          if(e.key === 'l') applyTheme('light');
-        });
-
-        // EFFORT BADGES: read data-effort attribute and populate .effort-badge
-        document.querySelectorAll('.color-container').forEach(card => {
-          const badge = card.querySelector('.effort-badge');
-          const effort = card.getAttribute('data-effort') || '';
-          if(badge){
-            badge.textContent = effort ? `Effort • ${effort}` : 'Effort • —';
-          }
-          // make card keyboard-focusable without altering layout
-          if(!card.hasAttribute('tabindex')) card.setAttribute('tabindex','0');
-        });
-
-        // If you set theme externally (e.g., via devtools), reflect UI buttons:
-        const observer = new MutationObserver(()=> {
-          const isDark = document.body.classList.contains('dark');
-          if(isDark){ btnDark.classList.add('active'); btnLight.classList.remove('active'); } else { btnLight.classList.add('active'); btnDark.classList.remove('active'); }
-        });
-        observer.observe(document.body, { attributes: true, attributeFilter: ['class'] });
-
-      })();
-    </script>
+    <script src="script.js"></script>
   </body>
 </html>
