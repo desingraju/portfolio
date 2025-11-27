@@ -1,255 +1,170 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="utf-8" />
+    <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>My Portfolio</title>
     <link rel="stylesheet" href="style.css" />
     <link rel="stylesheet" href="mediaqueries.css" />
     <style>
-      /* ---------------------------
-         Project hover (tilt + overlay)
-         Non-invasive — works with your existing CSS.
-         --------------------------- */
-      .about-containers { perspective: 1100px; }
-
-      .details-container.color-container {
-        position: relative;
-        border-radius: 14px;
-        transition: transform 380ms cubic-bezier(.2,.9,.2,1),
-                    box-shadow 380ms, filter 380ms;
-        transform-style: preserve-3d;
-        will-change: transform;
-        overflow: visible;
+      /* ---------- THEME VARIABLES ---------- */
+      :root{
+        --bg: #f7f7fb;
+        --card-bg: rgba(255,255,255,0.6);
+        --panel-bg: rgba(255,255,255,0.4);
+        --text: #111827;
+        --muted: #4b5563;
+        --accent: #7c3aed;
+        --glass-border: rgba(255,255,255,0.6);
+        --shadow: 0 6px 20px rgba(25,25,25,0.07);
+        --card-glow: rgba(124,58,237,0.12);
       }
 
-      .details-container.color-container .project-img {
-        display: block;
-        width: 100%;
-        border-radius: 12px;
-        transition: transform 380ms cubic-bezier(.2,.9,.2,1), filter 380ms;
-        transform-origin: 50% 35%;
+      /* dark theme variables */
+      body.dark {
+        --bg: #0b1220;
+        --card-bg: rgba(12,18,28,0.6);
+        --panel-bg: rgba(12,18,28,0.4);
+        --text: #e6eef8;
+        --muted: #94a3b8;
+        --accent: #8b5cf6;
+        --glass-border: rgba(255,255,255,0.04);
+        --shadow: 0 10px 30px rgba(2,6,23,0.6);
+        --card-glow: rgba(139,92,246,0.09);
       }
 
-      /* subtle overlay that appears on hover */
-      .details-container.color-container::before {
-        content: "";
-        position: absolute;
-        inset: 0;
-        border-radius: 12px;
-        background: linear-gradient(180deg, rgba(8, 10, 20, 0.0), rgba(8, 8, 20, 0.06));
-        opacity: 0;
-        transition: opacity 300ms ease, transform 400ms ease;
-        pointer-events: none;
+      /* apply base */
+      html,body{
+        height:100%;
+        margin:0;
+        font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial;
+        background: linear-gradient(180deg,var(--bg), #e9efff00 60%);
+        color:var(--text);
+        -webkit-font-smoothing:antialiased;
+        -moz-osx-font-smoothing:grayscale;
       }
 
-      .details-container.color-container .proj-overlay {
-        position: absolute;
-        left: 12px;
-        right: 12px;
-        bottom: 12px;
-        padding: 10px 12px;
-        border-radius: 10px;
-        background: rgba(255,255,255,0.92);
-        transform: translateY(12px);
-        opacity: 0;
-        box-shadow: 0 8px 24px rgba(6,10,20,0.08);
-        transition: transform 300ms cubic-bezier(.2,.9,.2,1), opacity 250ms ease, backdrop-filter 260ms;
-        backdrop-filter: blur(6px);
-        font-weight: 600;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 8px;
+      /* ensure existing classes inherit visible colors */
+      nav, footer, section, .section-container, .about-details-container, .experience-details-container {
+        color: var(--text);
       }
 
-      .proj-overlay .overlay-title { font-size: 13px; letter-spacing: .3px; }
-      .proj-overlay .overlay-actions { display: flex; gap: 8px; }
+      /* make links accessible */
+      a { color: var(--accent); text-decoration: none; }
+      a:hover { text-decoration: underline; }
 
-      .details-container.color-container:hover {
-        transform: translateY(-12px) rotateX(6deg) rotateZ(-0.5deg) scale(1.01);
-        box-shadow: 0 22px 48px rgba(10, 18, 40, 0.18), 0 4px 12px rgba(100, 70, 255, 0.06);
-        z-index: 30;
-        filter: saturate(1.04);
-      }
-      .details-container.color-container:hover .project-img {
-        transform: translateY(-8px) scale(1.04) rotateZ(-0.3deg);
-        filter: contrast(1.04);
-      }
-      .details-container.color-container:hover::before { opacity: 1; }
-      .details-container.color-container:hover .proj-overlay {
-        transform: translateY(0);
-        opacity: 1;
-      }
-
-      .details-container.color-container::after {
-        content: "";
-        position: absolute;
-        inset: 6px;
-        border-radius: 10px;
-        pointer-events: none;
-        transition: box-shadow 300ms, opacity 300ms;
-        opacity: 0;
-      }
-      .details-container.color-container:hover::after {
-        opacity: 1;
-        box-shadow: 0 0 34px rgba(120, 95, 255, 0.14), 0 0 10px rgba(120, 95, 255, 0.06) inset;
-      }
-
-      .details-container.color-container .btn-container .project-btn {
-        transition: transform 220ms, box-shadow 220ms;
-      }
-      .details-container.color-container:hover .btn-container .project-btn {
-        transform: translateY(-6px);
-        box-shadow: 0 10px 22px rgba(10, 16, 30, 0.12);
-      }
-
-      @media (max-width: 720px) {
-        .details-container.color-container:hover {
-          transform: translateY(-8px) rotateX(0) rotateZ(0) scale(1.005);
-        }
-        .details-container.color-container .project-img { transform: none; }
-      }
-
-      /* ---------------------------
-         Theme toggle (top-right switch)
-         Non-invasive dark-mode — does NOT set body background.
-         --------------------------- */
-
-      .theme-switch-wrap {
+      /* ---------- THEME TOGGLE (top-right) ---------- */
+      #theme-toggle {
         position: fixed;
+        top: 18px;
         right: 18px;
-        top: 18px; /* moved to top-right */
         z-index: 9999;
-        display: flex;
-        gap: 10px;
-        align-items: center;
+        display:flex;
+        align-items:center;
+        gap:10px;
+        background: var(--panel-bg);
+        border: 1px solid var(--glass-border);
         padding: 6px;
         border-radius: 999px;
-        pointer-events: auto;
+        box-shadow: var(--shadow);
+        backdrop-filter: blur(8px) saturate(1.1);
       }
-
-      .theme-switch {
-        --w: 62px;
-        --h: 34px;
-        display: inline-grid;
-        place-items: center;
-        width: var(--w);
-        height: var(--h);
-      }
-      .theme-switch input { position: absolute; opacity: 0; pointer-events: none; }
-
-      .theme-switch .track {
-        width: var(--w);
-        height: var(--h);
-        border-radius: 999px;
-        background: linear-gradient(180deg, #e7e7ea, #dcdce6);
-        box-shadow: 0 6px 16px rgba(8, 12, 24, 0.08), inset 0 1px 0 rgba(255,255,255,0.6);
-        position: relative;
-        transition: background 260ms ease, box-shadow 260ms ease, transform 260ms;
-      }
-
-      .theme-switch .knob {
-        position: absolute;
-        top: 50%;
-        left: 6px;
-        width: 26px;
-        height: 26px;
-        transform: translateY(-50%);
+      #theme-toggle button {
+        border: none;
+        background: transparent;
+        cursor: pointer;
+        font-size: 18px;
+        padding: 6px;
         border-radius: 50%;
-        background: radial-gradient(circle at 30% 30%, #fff, #f7f7f9);
-        box-shadow: 0 6px 16px rgba(12,18,30,0.18);
-        transition: left 260ms cubic-bezier(.2,.9,.2,1), transform 260ms, box-shadow 260ms;
-        display: grid;
-        place-items: center;
+        display:grid;
+        place-items:center;
+        width:38px;
+        height:38px;
+      }
+      #theme-toggle button:focus { outline: 2px solid rgba(0,0,0,0.12); }
+
+      /* toggle active styles */
+      #theme-toggle .active {
+        transform: scale(1.06);
+        box-shadow: 0 6px 18px var(--card-glow);
+        background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01));
+      }
+
+      /* small label (for accessibility on larger screens) */
+      #theme-toggle .label { display:none; font-size:13px; color:var(--muted); margin-right:6px; }
+      @media(min-width:760px){ #theme-toggle .label { display:inline-block; } }
+
+      /* ---------- PROJECT CARD HOVER EFFECTS ---------- */
+      /* target your project card container class .color-container */
+      .color-container{
+        background: linear-gradient(180deg, var(--card-bg), rgba(255,255,255,0.02));
+        border-radius: 14px;
+        padding: 18px;
+        transition: transform 300ms cubic-bezier(.2,.9,.2,1), box-shadow 300ms, background 300ms;
+        box-shadow: var(--shadow);
+        border: 1px solid var(--glass-border);
+        transform-style: preserve-3d;
+        will-change: transform;
+        perspective: 1000px; /* keep tilt smooth */
+        position: relative;
         overflow: hidden;
       }
 
-      .knob .knob-icon { width: 14px; height: 14px; display: block; position: relative; }
-      .knob .sun {
-        border-radius: 50%;
-        background: radial-gradient(circle at 30% 30%, #fff9d6, #ffd24a 60%);
-        box-shadow: 0 2px 6px rgba(255,180,40,0.18);
-      }
-      .knob .moon {
+      /* inner glow element to create soft highlight */
+      .color-container::after {
+        content: "";
         position: absolute;
-        right: -6px;
-        width: 14px;
-        height: 14px;
-        border-radius: 50%;
-        background: linear-gradient(180deg,#e9eef9,#d6def0);
-        clip-path: circle(50% at 40% 45%);
+        inset: 0;
+        pointer-events: none;
+        background: radial-gradient(600px 200px at var(--x,50%) var(--y,0%), var(--card-glow), transparent 30%);
         opacity: 0;
-        transform: translateX(6px) scale(.9);
+        transition: opacity 250ms;
       }
 
-      .theme-switch input:checked + .track {
-        background: linear-gradient(180deg,#111827,#0b1220);
-        box-shadow: 0 12px 30px rgba(4,8,18,0.6), inset 0 -2px 6px rgba(255,255,255,0.02);
+      /* on hover: lift and glow */
+      .color-container:hover {
+        transform: translateY(-10px) rotateZ(0deg) scale(1.02);
+        box-shadow: 0 18px 40px rgba(2,6,23,0.18);
+        cursor: pointer;
       }
-      .theme-switch input:checked + .track .knob {
-        left: calc(var(--w) - 6px - 26px);
-        transform: translateY(-50%) rotate(6deg);
-        box-shadow: 0 12px 28px rgba(2,6,23,0.48);
-      }
-      .theme-switch input:checked + .track .knob .sun {
-        opacity: 0;
-        transform: translateX(-8px) scale(.8);
-      }
-      .theme-switch input:checked + .track .knob .moon {
-        opacity: 1;
-        transform: translateX(0) scale(1);
+      .color-container:hover::after { opacity: 1; }
+
+      /* project image nice fit */
+      .project-img { width:100%; height:160px; object-fit:cover; border-radius:10px; display:block; }
+
+      /* project title and buttons remain visible */
+      .project-title { color:var(--text); margin:12px 0 8px; letter-spacing:0.6px; }
+      .project-btn { margin-right:8px; }
+
+      /* reduce tilt transform when on small screens */
+      @media (max-width:480px) {
+        .color-container { transform:none !important; }
       }
 
-      .theme-label {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 2px;
-        user-select: none;
-        font-weight: 700;
-        font-size: 12px;
-        color: #222;
-      }
-      .theme-label .label-dark { display: none; color: #dbeafe; }
+      /* ---------- small accessibility and focus improvements ---------- */
+      .project-btn:focus, .btn:focus { outline: 3px solid rgba(124,58,237,0.18); outline-offset: 3px; border-radius:8px; }
 
-      /* show dark label only when dark-mode active */
-      body.dark-mode .theme-label .label-light { display: none; }
-      body.dark-mode .theme-label .label-dark { display: block; }
-
-      @media (max-width: 520px) {
-        .theme-switch-wrap { right: 10px; top: 10px; }
-        .theme-label { font-size: 11px; }
+      /* ensure all text uses clear contrast when dark theme is active */
+      body.dark p, body.dark h1, body.dark h2, body.dark h3, body.dark a {
+        color: var(--text);
       }
 
-      /* ---------------------------
-         Safe dark-mode overrides (DO NOT change backgrounds globally)
-         Only adjust colors that typically improve contrast.
-         --------------------------- */
+      /* keep existing .icon etc usable but ensure visibility */
+      .icon { filter: none; }
 
-      /* change primary text & link colors */
-      body.dark-mode {
-        color: #e6f3ff; /* text color */
-      }
-      body.dark-mode a { color: #9fd1ff; }
-
-      /* slightly brighten small icon images so they remain visible */
-      body.dark-mode img.icon {
-        filter: brightness(1.05) saturate(0.55) contrast(1.05);
-      }
-
-      /* subtle card background to separate cards from page background (optional) */
-      body.dark-mode .details-container.color-container {
-        background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-      }
-
-      /* keep default backgrounds untouched: do NOT set body background here */
-      /* If you want a full-page dark background later, we can add a safe option. */
+      /* about paragraph readability */
+      .about-para { color:var(--muted); }
     </style>
   </head>
-
   <body>
+    <!-- THEME TOGGLE PINNED TOP-RIGHT -->
+    <div id="theme-toggle" aria-hidden="false" title="Toggle light / dark mode">
+      <span class="label">Theme</span>
+      <button id="btn-day" aria-pressed="false" title="Switch to light mode">☀️</button>
+      <button id="btn-night" aria-pressed="false" title="Switch to dark mode">🌙</button>
+    </div>
+
     <nav id="desktop-nav">
       <div class="logo">Desing Raju Chavvakula</div>
       <div>
@@ -261,7 +176,6 @@
         </ul>
       </div>
     </nav>
-
     <nav id="hamburger-nav">
       <div class="logo">Desing Raju</div>
       <div class="hamburger-menu">
@@ -278,7 +192,6 @@
         </div>
       </div>
     </nav>
-
     <section id="profile">
       <div class="section__pic-container">
         <img src="./assets/profile-pic.png" alt="John Doe profile picture" />
@@ -288,46 +201,77 @@
         <h1 class="title">Desing Raju Chavvakula</h1>
         <p class="section__text__p2">Full Stack Python Developer</p>
         <div class="btn-container">
-          <button class="btn btn-color-2" onclick="window.open('./assets/Desing_Raju_Resume.pdf')">Download CV</button>
-          <button class="btn btn-color-1" onclick="location.href='./#contact'">Contact Info</button>
+          <button
+            class="btn btn-color-2"
+            onclick="window.open('./assets/Desing_Raju_Resume.pdf')"
+          >
+            Download CV
+          </button>
+          <button class="btn btn-color-1" onclick="location.href='./#contact'">
+            Contact Info
+          </button>
         </div>
         <div id="socials-container">
-          <img src="./assets/linkedin.png" alt="My LinkedIn profile" class="icon" onclick="location.href='https://www.linkedin.com/in/desing-raju/'" />
-          <img src="./assets/github.png" alt="My Github profile" class="icon" onclick="location.href='https://github.com/desingraju'" />
+          <img
+            src="./assets/linkedin.png"
+            alt="My LinkedIn profile"
+            class="icon"
+            onclick="location.href='https://www.linkedin.com/in/desing-raju/'"
+          />
+          <img
+            src="./assets/github.png"
+            alt="My Github profile"
+            class="icon"
+            onclick="location.href='https://github.com/desingraju'"
+          />
         </div>
       </div>
     </section>
-
     <section id="about">
       <p class="section__text__p1">Get To Know More</p>
       <h1 class="title">About Me</h1>
       <div class="section-container">
         <div class="section__pic-container">
-          <img src="./assets/about-pic.png" alt="Profile picture" class="about-pic" />
+          <img
+            src="./assets/about-pic.png"
+            alt="Profile picture"
+            class="about-pic"
+          />
         </div>
         <div class="about-details-container">
           <div class="about-containers">
             <div class="details-container">
-              <img src="./assets/experience.png" alt="Experience icon" class="icon" />
+              <img
+                src="./assets/experience.png"
+                alt="Experience icon"
+                class="icon"
+              />
               <h3>Experience</h3>
               <p>1 year<br />Python Full Stack Development</p>
             </div>
             <div class="details-container">
-              <img src="./assets/education.png" alt="Education icon" class="icon" />
+              <img
+                src="./assets/education.png"
+                alt="Education icon"
+                class="icon"
+              />
               <h3>Education</h3>
               <p>B.Tech Bachelors Degree<br />(Information Technology) </p>
             </div>
           </div>
           <div class="text-container">
-            <p class="about-para" style="text-align:left; line-height:1.6;">
-              Aspiring Software Developer with strong foundational skills in Python, SQL, and full-stack web development. Enthusiastic and quick-learning developer with a solid academic background and hands-on internship experience in building end-to-end applications. Skilled in problem-solving, clean code practices, and efficient UI/UX design. Passionate about leveraging technology to create reliable and scalable solutions. A proactive team player with excellent communication skills, eager to contribute to innovative projects in a collaborative environment. Highly committed to continuous learning, professional growth, and adapting to new technologies.
+            <p class="about-para">Aspiring Software Developer with strong foundational skills in Python, SQL, and full-stack web development. Enthusiastic and quick-learning developer with a solid academic background and hands-on internship experience in building end-to-end applications. Skilled in problem-solving, clean code practices, and efficient UI/UX design. Passionate about leveraging technology to create reliable and scalable solutions. A proactive team player with excellent communication skills, eager to contribute to innovative projects in a collaborative environment. Highly committed to continuous learning, professional growth, and adapting to new technologies.
             </p>
           </div>
         </div>
       </div>
-      <img src="./assets/arrow.png" alt="Arrow icon" class="icon arrow" onclick="location.href='./#experience'" />
+      <img
+        src="./assets/arrow.png"
+        alt="Arrow icon"
+        class="icon arrow"
+        onclick="location.href='./#experience'"
+      />
     </section>
-
     <section id="experience">
       <p class="section__text__p1">Explore My</p>
       <h1 class="title">Experience</h1>
@@ -337,153 +281,399 @@
             <h2 class="experience-sub-title">Frontend Development</h2>
             <div class="article-container">
               <article>
-                <img src="./assets/checkmark.png" alt="Experience icon" class="icon" />
-                <div><h3>HTML</h3><p>Experienced</p></div>
+                <img
+                  src="./assets/checkmark.png"
+                  alt="Experience icon"
+                  class="icon"
+                />
+                <div>
+                  <h3>HTML</h3>
+                  <p>Experienced</p>
+                </div>
               </article>
               <article>
-                <img src="./assets/checkmark.png" alt="Experience icon" class="icon" />
-                <div><h3>CSS</h3><p>Experienced</p></div>
+                <img
+                  src="./assets/checkmark.png"
+                  alt="Experience icon"
+                  class="icon"
+                />
+                <div>
+                  <h3>CSS</h3>
+                  <p>Experienced</p>
+                </div>
               </article>
               <article>
-                <img src="./assets/checkmark.png" alt="Experience icon" class="icon" />
-                <div><h3>Bootstrap Framework</h3><p>Basic</p></div>
+                <img
+                  src="./assets/checkmark.png"
+                  alt="Experience icon"
+                  class="icon"
+                />
+                <div>
+                  <h3>Bootstrap Framework</h3>
+                  <p>Basic</p>
+                </div>
               </article>
               <article>
-                <img src="./assets/checkmark.png" alt="Experience icon" class="icon" />
-                <div><h3>Django Templates</h3><p>Intermediate</p></div>
+                <img
+                  src="./assets/checkmark.png"
+                  alt="Experience icon"
+                  class="icon"
+                />
+                <div>
+                  <h3>Django Templates</h3>
+                  <p>Intermediate</p>
+                </div>
               </article>
             </div>
           </div>
-
           <div class="details-container">
             <h2 class="experience-sub-title">Backend Development</h2>
             <div class="article-container">
               <article>
-                <img src="./assets/checkmark.png" alt="Experience icon" class="icon" />
-                <div><h3>MYSQL</h3><p>Basic</p></div>
+                <img
+                  src="./assets/checkmark.png"
+                  alt="Experience icon"
+                  class="icon"
+                />
+                <div>
+                  <h3>MYSQL</h3>
+                  <p>Basic</p>
+                </div>
               </article>
               <article>
-                <img src="./assets/checkmark.png" alt="Experience icon" class="icon" />
-                <div><h3>Git</h3><p>Intermediate</p></div>
+                <img
+                  src="./assets/checkmark.png"
+                  alt="Experience icon"
+                  class="icon"
+                />
+                <div>
+                  <h3>Git</h3>
+                  <p>Intermediate</p>
+                </div>
               </article>
               <article>
-                <img src="./assets/checkmark.png" alt="Experience icon" class="icon" />
-                <div><h3>Django</h3><p>Basic</p></div>
+                <img
+                  src="./assets/checkmark.png"
+                  alt="Experience icon"
+                  class="icon"
+                />
+                <div>
+                  <h3>Django</h3>
+                  <p>Basic</p>
+                </div>
               </article>
               <article>
-                <img src="./assets/checkmark.png" alt="Experience icon" class="icon" />
-                <div><h3>Python</h3><p>Intermediate</p></div>
+                <img
+                  src="./assets/checkmark.png"
+                  alt="Experience icon"
+                  class="icon"
+                />
+                <div>
+                  <h3>Python</h3>
+                  <p>Intermediate</p>
+                </div>
               </article>
             </div>
           </div>
         </div>
       </div>
-      <img src="./assets/arrow.png" alt="Arrow icon" class="icon arrow" onclick="location.href='./#projects'" />
+      <img
+        src="./assets/arrow.png"
+        alt="Arrow icon"
+        class="icon arrow"
+        onclick="location.href='./#projects'"
+      />
     </section>
-
     <section id="projects">
       <p class="section__text__p1">Browse My Recent</p>
       <h1 class="title">Projects</h1>
       <div class="experience-details-container">
         <div class="about-containers">
-          <!-- project card example - repeat in your existing list -->
-          <div class="details-container color-container" data-desc="Meal planner app">
+          <div class="details-container color-container">
             <div class="article-container">
-              <img src="./assets/project-1.png" alt="project-1" class="project-img" />
+              <img
+                src="./assets/project-1.png"
+                alt="project-1"
+                class="project-img"
+              />
             </div>
             <h2 class="experience-sub-title project-title">MEAL PLANNER</h2>
             <div class="btn-container">
-              <button class="btn btn-color-2 project-btn" onclick="location.href='https://desingraju.github.io/Mealplanner/'">Github</button>
-              <button class="btn btn-color-2 project-btn" onclick="location.href='https://github.com/'">Live Demo</button>
-            </div>
-
-            <!-- overlay shown on hover -->
-            <div class="proj-overlay" aria-hidden="true">
-              <div class="overlay-title">Meal Planner — HTML / CSS / JS</div>
-              <div class="overlay-actions">
-                <button class="btn btn-color-2 project-btn" onclick="location.href='https://desingraju.github.io/Mealplanner/'">Code</button>
-              </div>
+              <button
+                class="btn btn-color-2 project-btn"
+                onclick="location.href='https://desingraju.github.io/Mealplanner/'"
+              >
+                Github
+              </button>
+              <button
+                class="btn btn-color-2 project-btn"
+                onclick="location.href='https://github.com/'"
+              >
+                Live Demo
+              </button>
             </div>
           </div>
-
-          <!-- copy your other project entries here. Keep the same structure. -->
           <div class="details-container color-container">
             <div class="article-container">
-              <img src="./assets/project-2.png" alt="project-2" class="project-img" />
+              <img
+                src="./assets/project-2.png"
+                alt="project-2"
+                class="project-img"
+              />
             </div>
             <h2 class="experience-sub-title project-title">YUMMY HUB</h2>
             <div class="btn-container">
-              <button class="btn btn-color-2 project-btn" onclick="location.href='https://desingraju.github.io/Foodie_'">Github</button>
-              <button class="btn btn-color-2 project-btn" onclick="location.href='https://github.com/'">Live Demo</button>
-            </div>
-            <div class="proj-overlay" aria-hidden="true">
-              <div class="overlay-title">Yummy Hub — Responsive site</div>
-              <div class="overlay-actions"><button class="btn btn-color-2 project-btn">View</button></div>
+              <button
+                class="btn btn-color-2 project-btn"
+                onclick="location.href='https://desingraju.github.io/Foodie_'"
+              >
+                Github
+              </button>
+              <button
+                class="btn btn-color-2 project-btn"
+                onclick="location.href='https://github.com/'"
+              >
+                Live Demo
+              </button>
             </div>
           </div>
-
-          <!-- Add rest of your project elements as in your original file -->
-          <!-- ... -->
-
+          <div class="details-container color-container">
+            <div class="article-container">
+              <img
+                src="./assets/project-4.png"
+                alt="project-4"
+                class="project-img"
+              />
+            </div>
+            <h2 class="experience-sub-title project-title">THE BIG-DAY</h2>
+            <div class="btn-container">
+              <button
+                class="btn btn-color-2 project-btn"
+                onclick="location.href='https://desingraju.github.io/TimerforEvent/'"
+              >
+                Github
+              </button>
+              <button
+                class="btn btn-color-2 project-btn"
+                onclick="location.href='https://github.com/'"
+              >
+                Live Demo
+              </button>
+            </div>
+          </div>
+          <div class="details-container color-container">
+            <div class="article-container">
+              <img
+                src="./assets/project-7.png"
+                alt="project-5"
+                class="project-img"
+              />
+            </div>
+             <h2 class="experience-sub-title project-title">TRAVEL YARI</h2>
+            <div class="btn-container">
+              <button
+                class="btn btn-color-2 project-btn"
+                onclick="location.href='https://desingraju.github.io/Travelyari/'"
+              >
+                Github
+              </button>
+              <button
+                class="btn btn-color-2 project-btn"
+                onclick="location.href='https://github.com/'"
+              >
+                Live Demo
+              </button>
+            </div>
+          </div>
+          <div class="details-container color-container">
+            <div class="article-container">
+              <img
+                src="./assets/project-3.png"
+                alt="project-2"
+                class="project-img"
+              />
+            </div>
+              <h2 class="experience-sub-title project-title">TRUST BANK</h2>
+            <div class="btn-container">
+              <button
+                class="btn btn-color-2 project-btn"
+                onclick="location.href='https://replit.com/@desingrajuchavv/Bank-Application?v=1'"
+              >
+                Github
+              </button>
+              <button
+                class="btn btn-color-2 project-btn"
+                onclick="location.href='https://github.com/'"
+              >
+                Live Demo
+              </button>
+            </div>
+          </div>
         </div>
       </div>
-      <img src="./assets/arrow.png" alt="Arrow icon" class="icon arrow" onclick="location.href='./#contact'" />
-    </section>
-
-    <!-- extra project section from your original file (kept intact) -->
+      <img
+        src="./assets/arrow.png"
+        alt="Arrow icon"
+        class="icon arrow"
+        onclick="location.href='./#contact'"
+      />
+      </section>
     <section>
+      <p class="section__text__p1"></p>
+      <h1 class="title"> </h1>
       <div class="experience-details-container">
         <div class="about-containers">
           <div class="details-container color-container">
             <div class="article-container">
-              <img src="./assets/project-5.png" alt="project-4" class="project-img" />
+              <img
+                src="./assets/project-5.png"
+                alt="project-4"
+                class="project-img"
+              />
             </div>
             <h2 class="experience-sub-title project-title">BUY BUDDY</h2>
             <div class="btn-container">
-              <button class="btn btn-color-2 project-btn" onclick="location.href='https://replit.com/@desingrajuchavv/E-Commerce-Application?v=1'">Github</button>
-              <button class="btn btn-color-2 project-btn" onclick="location.href='https://github.com/'">Live Demo</button>
-            </div>
-            <div class="proj-overlay" aria-hidden="true">
-              <div class="overlay-title">Buy Buddy — E-commerce demo</div>
-              <div class="overlay-actions"><button class="btn btn-color-2 project-btn">Open</button></div>
+              <button
+                class="btn btn-color-2 project-btn"
+                onclick="location.href='https://replit.com/@desingrajuchavv/E-Commerce-Application?v=1'"
+              >
+                Github
+              </button>
+              <button
+                class="btn btn-color-2 project-btn"
+                onclick="location.href='https://github.com/'"
+              >
+                Live Demo
+              </button>
             </div>
           </div>
-
           <div class="details-container color-container">
             <div class="article-container">
-              <img src="./assets/project-6.png" alt="project-6" class="project-img" />
+              <img
+                src="./assets/project-6.png"
+                alt="project-6"
+                class="project-img"
+              />
             </div>
             <h2 class="experience-sub-title project-title">BRAIN BUZZ</h2>
             <div class="btn-container">
-              <button class="btn btn-color-2 project-btn" onclick="location.href='https://replit.com/@desingrajuchavv/Quiz-App?v=1'">Github</button>
-              <button class="btn btn-color-2 project-btn" onclick="location.href='https://github.com/'">Live Demo</button>
+              <button
+                class="btn btn-color-2 project-btn"
+                onclick="location.href='https://replit.com/@desingrajuchavv/Quiz-App?v=1'"
+              >
+                Github
+              </button>
+              <button
+                class="btn btn-color-2 project-btn"
+                onclick="location.href='https://github.com/'"
+              >
+                Live Demo
+              </button>
             </div>
-            <div class="proj-overlay" aria-hidden="true">
-              <div class="overlay-title">Brain Buzz — Quiz App</div>
-              <div class="overlay-actions"><button class="btn btn-color-2 project-btn">Try</button></div>
+            </div>
+                <div class="details-container color-container">
+            <div class="article-container">
+              <img
+                src="./assets/project-8.png"
+                alt="project-2"
+                class="project-img"
+              />
+            </div>
+             <h2 class="experience-sub-title project-title">STAFF INFO</h2>
+            <div class="btn-container">
+              <button
+                class="btn btn-color-2 project-btn"
+                onclick="location.href='https://edms1.pythonanywhere.com/'"
+              >
+                Github
+              </button>
+              <button
+                class="btn btn-color-2 project-btn"
+                onclick="location.href='https://github.com/'"
+              >
+                Live Demo
+              </button>
             </div>
           </div>
-
-          <!-- ... more projects as originally included ... -->
+          <div class="details-container color-container">
+            <div class="article-container">
+              <img
+                src="./assets/project-10.png"
+                alt="project-2"
+                class="project-img"
+              />
+            </div>
+             <h2 class="experience-sub-title project-title">CAMPUS CLOUD</h2>
+            <div class="btn-container">
+              <button
+                class="btn btn-color-2 project-btn"
+                onclick="location.href='https://raju.pythonanywhere.com/'"
+              >
+                Github
+              </button>
+              <button
+                class="btn btn-color-2 project-btn"
+                onclick="location.href='https://github.com/'"
+              >
+                Live Demo
+              </button>
+            </div>
+          </div>
+          <div class="details-container color-container">
+            <div class="article-container">
+              <img
+                src="./assets/project-9.png"
+                alt="project-2"
+                class="project-img"
+              />
+            </div>
+            <h2 class="experience-sub-title project-title">FORM TO CV</h2>
+            <div class="btn-container">
+              <button
+                class="btn btn-color-2 project-btn"
+                onclick="location.href='https://sendresume.pythonanywhere.com/'"
+              >
+                Github
+              </button>
+              <button
+                class="btn btn-color-2 project-btn"
+                onclick="location.href='https://github.com/'"
+              >
+                Live Demo
+              </button>
+            </div>
+          </div>
         </div>
       </div>
+      <img
+        src="./assets/arrow.png"
+        alt="Arrow icon"
+        class="icon arrow"
+        onclick="location.href='./#contact'"
+      />
     </section>
-
     <section id="contact">
       <p class="section__text__p1">Get in Touch</p>
       <h1 class="title">Contact Me</h1>
       <div class="contact-info-upper-container">
         <div class="contact-info-container">
-          <img src="./assets/email.png" alt="Email icon" class="icon contact-icon email-icon" />
+          <img
+            src="./assets/email.png"
+            alt="Email icon"
+            class="icon contact-icon email-icon"
+          />
           <p><a href="mailto:desingrajuchavvakula@gmail.com">desingrajuchavvakula@gmail.com</a></p>
         </div>
         <div class="contact-info-container">
-          <img src="./assets/linkedin.png" alt="LinkedIn icon" class="icon contact-icon" />
+          <img
+            src="./assets/linkedin.png"
+            alt="LinkedIn icon"
+            class="icon contact-icon"
+          />
           <p><a href="https://www.linkedin.com/in/desing-raju/">LinkedIn</a></p>
         </div>
       </div>
     </section>
-
     <footer>
       <nav>
         <div class="nav-links-container">
@@ -498,63 +688,106 @@
       <p>Copyright &#169; 2025 Desing Raju. All Rights Reserved.</p>
     </footer>
 
-    <!-- THEME TOGGLE (placed top-right) -->
-    <div class="theme-switch-wrap" role="region" aria-label="Theme switch">
-      <label class="theme-switch" aria-label="Toggle dark mode" tabindex="0">
-        <input id="theme-checkbox" type="checkbox" />
-        <div class="track" role="presentation">
-          <div class="knob" aria-hidden="true">
-            <span class="knob-icon">
-              <span class="sun" aria-hidden="true"></span>
-              <span class="moon" aria-hidden="true"></span>
-            </span>
-          </div>
-        </div>
-      </label>
-
-      <div class="theme-label" aria-hidden="true">
-        <span class="label-light">Light</span>
-        <span class="label-dark">Dark</span>
-      </div>
-    </div>
-
+    <!-- your existing script include (kept) -->
     <script src="script.js"></script>
 
+    <!-- ADDED JS: theme toggle + tilt & hover logic -->
     <script>
-      // Theme toggle: safe non-invasive behavior
-      (function () {
-        const checkbox = document.getElementById("theme-checkbox");
-        const body = document.body;
+      (function(){
+        // Theme toggle buttons
+        const btnDay = document.getElementById('btn-day');
+        const btnNight = document.getElementById('btn-night');
+        const rootBody = document.body;
 
-        // load saved preference
-        let saved = null;
-        try { saved = localStorage.getItem("desing_theme_dark"); } catch (e) { saved = null; }
+        const setTheme = (theme) => {
+          if(theme === 'dark'){
+            rootBody.classList.add('dark');
+            btnNight.classList.add('active');
+            btnDay.classList.remove('active');
+            btnNight.setAttribute('aria-pressed','true');
+            btnDay.setAttribute('aria-pressed','false');
+          } else {
+            rootBody.classList.remove('dark');
+            btnDay.classList.add('active');
+            btnNight.classList.remove('active');
+            btnDay.setAttribute('aria-pressed','true');
+            btnNight.setAttribute('aria-pressed','false');
+          }
+          try { localStorage.setItem('site-theme', theme); } catch(e){}
+        };
 
-        if (saved !== null) {
-          const isDark = saved === "true";
-          body.classList.toggle("dark-mode", isDark);
-          checkbox.checked = !!isDark;
+        // initialize from localStorage or system preference
+        const saved = (function(){ try { return localStorage.getItem('site-theme'); } catch(e){ return null; }})();
+        if(saved){
+          setTheme(saved);
         } else {
-          const prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
-          body.classList.toggle("dark-mode", prefersDark);
-          checkbox.checked = !!prefersDark;
+          const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+          setTheme(prefersDark ? 'dark' : 'light');
         }
 
-        checkbox.addEventListener("change", function () {
-          const isDark = checkbox.checked;
-          body.classList.toggle("dark-mode", isDark);
-          try { localStorage.setItem("desing_theme_dark", isDark ? "true" : "false"); } catch (e) {}
+        btnDay.addEventListener('click', ()=> setTheme('light'));
+        btnNight.addEventListener('click', ()=> setTheme('dark'));
+
+        // ----------------- CARD TILT EFFECT -----------------
+        // Apply interactive 3D tilt to each .color-container (project card)
+        const cards = Array.from(document.querySelectorAll('.color-container'));
+
+        cards.forEach(card => {
+          // skip on touch devices to avoid accidental behavior
+          let isTouch = ('ontouchstart' in window) || navigator.maxTouchPoints > 0;
+          if(isTouch) return;
+
+          const rectPadding = 16;
+          card.addEventListener('mousemove', (e) => {
+            const rect = card.getBoundingClientRect();
+            const posX = e.clientX - rect.left;
+            const posY = e.clientY - rect.top;
+            const px = (posX / rect.width) - 0.5; // -0.5 .. 0.5
+            const py = (posY / rect.height) - 0.5;
+
+            const rotateY = (px * 14); // more or less tilt
+            const rotateX = -(py * 10);
+
+            // set CSS transform for a subtle 3D tilt + translate
+            card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateZ(8px) scale(1.02)`;
+
+            // update highlight center for glow
+            card.style.setProperty('--x', (px + 0.5) * 100 + '%');
+            card.style.setProperty('--y', (py + 0.2) * 100 + '%');
+          });
+
+          card.addEventListener('mouseleave', () => {
+            // smoothly return to normal
+            card.style.transition = 'transform 450ms cubic-bezier(.22,.9,.2,1)';
+            card.style.transform = '';
+            // hide glow
+            card.style.setProperty('--x', '50%');
+            card.style.setProperty('--y', '0%');
+            setTimeout(()=> card.style.transition = '', 500);
+          });
+
+          card.addEventListener('mouseenter', () => {
+            card.style.transition = 'transform 160ms linear';
+          });
+
+          // keyboard accessibility: give focus styles and tiny scale
+          card.setAttribute('tabindex','0');
+          card.addEventListener('focus', () => {
+            card.style.transform = 'translateY(-8px) scale(1.02)';
+          });
+          card.addEventListener('blur', () => {
+            card.style.transform = '';
+          });
         });
 
-        // make label keyboard-accessible
-        const label = checkbox.closest(".theme-switch");
-        label.addEventListener("keydown", (e) => {
-          if (e.key === "Enter" || e.key === " ") {
-            e.preventDefault();
-            checkbox.checked = !checkbox.checked;
-            checkbox.dispatchEvent(new Event("change"));
-          }
-        });
+        // small safety: ensure text remains readable after toggling by forcing repaint of elements that may have CSS filters
+        const ensureReadable = () => {
+          document.querySelectorAll('img, .project-title, p, h1, h2, h3').forEach(el => {
+            el.style.willChange = 'auto';
+          });
+        };
+        window.addEventListener('resize', ensureReadable);
+        window.addEventListener('orientationchange', ensureReadable);
       })();
     </script>
   </body>
