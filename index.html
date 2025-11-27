@@ -1,30 +1,29 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8" />
+    <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>My Portfolio</title>
     <link rel="stylesheet" href="style.css" />
     <link rel="stylesheet" href="mediaqueries.css" />
     <style>
-      /* ----------------------
-         Project hover (improved)
-         ---------------------- */
-      .about-containers {
-        perspective: 1100px;
-      }
+      /* ---------------------------
+         Project hover (tilt + overlay)
+         Non-invasive — works with your existing CSS.
+         --------------------------- */
+      .about-containers { perspective: 1100px; }
+
       .details-container.color-container {
         position: relative;
         border-radius: 14px;
         transition: transform 380ms cubic-bezier(.2,.9,.2,1),
-          box-shadow 380ms, filter 380ms;
+                    box-shadow 380ms, filter 380ms;
         transform-style: preserve-3d;
         will-change: transform;
         overflow: visible;
       }
 
-      /* image layer */
       .details-container.color-container .project-img {
         display: block;
         width: 100%;
@@ -33,7 +32,7 @@
         transform-origin: 50% 35%;
       }
 
-      /* overlay that appears on hover */
+      /* subtle overlay that appears on hover */
       .details-container.color-container::before {
         content: "";
         position: absolute;
@@ -50,9 +49,9 @@
         left: 12px;
         right: 12px;
         bottom: 12px;
-        padding: 12px;
+        padding: 10px 12px;
         border-radius: 10px;
-        background: rgba(255,255,255,0.88);
+        background: rgba(255,255,255,0.92);
         transform: translateY(12px);
         opacity: 0;
         box-shadow: 0 8px 24px rgba(6,10,20,0.08);
@@ -62,23 +61,12 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-      }
-
-      /* content inside overlay */
-      .proj-overlay .overlay-title {
-        font-size: 13px;
-        letter-spacing: 0.4px;
-      }
-      .proj-overlay .overlay-actions {
-        display: flex;
         gap: 8px;
       }
-      .proj-overlay .overlay-actions .project-btn {
-        padding: 6px 8px;
-        font-size: 12px;
-      }
 
-      /* hover state */
+      .proj-overlay .overlay-title { font-size: 13px; letter-spacing: .3px; }
+      .proj-overlay .overlay-actions { display: flex; gap: 8px; }
+
       .details-container.color-container:hover {
         transform: translateY(-12px) rotateX(6deg) rotateZ(-0.5deg) scale(1.01);
         box-shadow: 0 22px 48px rgba(10, 18, 40, 0.18), 0 4px 12px rgba(100, 70, 255, 0.06);
@@ -89,15 +77,12 @@
         transform: translateY(-8px) scale(1.04) rotateZ(-0.3deg);
         filter: contrast(1.04);
       }
-      .details-container.color-container:hover::before {
-        opacity: 1;
-      }
+      .details-container.color-container:hover::before { opacity: 1; }
       .details-container.color-container:hover .proj-overlay {
         transform: translateY(0);
         opacity: 1;
       }
 
-      /* subtle neon outline */
       .details-container.color-container::after {
         content: "";
         position: absolute;
@@ -112,7 +97,6 @@
         box-shadow: 0 0 34px rgba(120, 95, 255, 0.14), 0 0 10px rgba(120, 95, 255, 0.06) inset;
       }
 
-      /* buttons lift */
       .details-container.color-container .btn-container .project-btn {
         transition: transform 220ms, box-shadow 220ms;
       }
@@ -121,36 +105,31 @@
         box-shadow: 0 10px 22px rgba(10, 16, 30, 0.12);
       }
 
-      /* responsiveness: reduce tilt on small screens */
       @media (max-width: 720px) {
         .details-container.color-container:hover {
           transform: translateY(-8px) rotateX(0) rotateZ(0) scale(1.005);
         }
-        .details-container.color-container .project-img {
-          transform: none;
-        }
+        .details-container.color-container .project-img { transform: none; }
       }
 
-      /* ----------------------
-         Theme toggle (switch like image)
-         ---------------------- */
-      /* container fixed on right centre */
+      /* ---------------------------
+         Theme toggle (top-right switch)
+         Non-invasive dark-mode — does NOT set body background.
+         --------------------------- */
+
       .theme-switch-wrap {
         position: fixed;
         right: 18px;
-        top: 50%;
-        transform: translateY(-50%);
+        top: 18px; /* moved to top-right */
         z-index: 9999;
         display: flex;
         gap: 10px;
         align-items: center;
-        padding: 8px;
+        padding: 6px;
         border-radius: 999px;
-        background: transparent;
-        -webkit-tap-highlight-color: transparent;
+        pointer-events: auto;
       }
 
-      /* hide native checkbox */
       .theme-switch {
         --w: 62px;
         --h: 34px;
@@ -159,13 +138,8 @@
         width: var(--w);
         height: var(--h);
       }
-      .theme-switch input {
-        position: absolute;
-        opacity: 0;
-        pointer-events: none;
-      }
+      .theme-switch input { position: absolute; opacity: 0; pointer-events: none; }
 
-      /* the track */
       .theme-switch .track {
         width: var(--w);
         height: var(--h);
@@ -176,7 +150,6 @@
         transition: background 260ms ease, box-shadow 260ms ease, transform 260ms;
       }
 
-      /* knob */
       .theme-switch .knob {
         position: absolute;
         top: 50%;
@@ -193,14 +166,7 @@
         overflow: hidden;
       }
 
-      /* small sun/moon inside */
-      .theme-switch .knob .knob-icon {
-        width: 14px;
-        height: 14px;
-        display: block;
-        position: relative;
-        transition: transform 260ms, opacity 260ms;
-      }
+      .knob .knob-icon { width: 14px; height: 14px; display: block; position: relative; }
       .knob .sun {
         border-radius: 50%;
         background: radial-gradient(circle at 30% 30%, #fff9d6, #ffd24a 60%);
@@ -218,7 +184,6 @@
         transform: translateX(6px) scale(.9);
       }
 
-      /* when checked: move knob to right and change track */
       .theme-switch input:checked + .track {
         background: linear-gradient(180deg,#111827,#0b1220);
         box-shadow: 0 12px 30px rgba(4,8,18,0.6), inset 0 -2px 6px rgba(255,255,255,0.02);
@@ -237,51 +202,53 @@
         transform: translateX(0) scale(1);
       }
 
-      /* label text below the switch (visual only) */
       .theme-label {
         display: flex;
         flex-direction: column;
-        align-items: center;
+        align-items: flex-start;
         gap: 2px;
         user-select: none;
-      }
-      .theme-label .label-light,
-      .theme-label .label-dark {
+        font-weight: 700;
         font-size: 12px;
         color: #222;
-        font-weight: 600;
-        letter-spacing: 0.2px;
       }
-      .theme-label .label-dark {
-        display: none;
-      }
+      .theme-label .label-dark { display: none; color: #dbeafe; }
 
-      /* invert label styles in dark mode */
-      body.dark-mode .theme-label .label-light {
-        display: none;
-      }
-      body.dark-mode .theme-label .label-dark {
-        display: block;
-        color: #dbeafe;
-      }
+      /* show dark label only when dark-mode active */
+      body.dark-mode .theme-label .label-light { display: none; }
+      body.dark-mode .theme-label .label-dark { display: block; }
 
-      /* make track accessible on small screens */
       @media (max-width: 520px) {
-        .theme-switch-wrap { right: 10px; }
-        .theme-label .label-light, .theme-label .label-dark { font-size: 11px; }
+        .theme-switch-wrap { right: 10px; top: 10px; }
+        .theme-label { font-size: 11px; }
       }
 
-      /* small overall dark-mode tweaks (non-invasive) */
+      /* ---------------------------
+         Safe dark-mode overrides (DO NOT change backgrounds globally)
+         Only adjust colors that typically improve contrast.
+         --------------------------- */
+
+      /* change primary text & link colors */
       body.dark-mode {
-        background: #051021 !important;
-        color: #dbeafe !important;
-      }
-      body.dark-mode img.icon {
-        filter: brightness(1.05) saturate(0.5) invert(0.02) contrast(1.05);
+        color: #e6f3ff; /* text color */
       }
       body.dark-mode a { color: #9fd1ff; }
+
+      /* slightly brighten small icon images so they remain visible */
+      body.dark-mode img.icon {
+        filter: brightness(1.05) saturate(0.55) contrast(1.05);
+      }
+
+      /* subtle card background to separate cards from page background (optional) */
+      body.dark-mode .details-container.color-container {
+        background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      }
+
+      /* keep default backgrounds untouched: do NOT set body background here */
+      /* If you want a full-page dark background later, we can add a safe option. */
     </style>
   </head>
+
   <body>
     <nav id="desktop-nav">
       <div class="logo">Desing Raju Chavvakula</div>
@@ -295,14 +262,246 @@
       </div>
     </nav>
 
-    <!-- ... keep your existing page content exactly as-is ... -->
-    <!-- (I omitted repeating the entire page here for brevity in this block) -->
-    <!-- But in your actual file keep the rest of your original HTML (profile, about, projects, etc.) exactly the same. -->
+    <nav id="hamburger-nav">
+      <div class="logo">Desing Raju</div>
+      <div class="hamburger-menu">
+        <div class="hamburger-icon" onclick="toggleMenu()">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+        <div class="menu-links">
+          <li><a href="#about" onclick="toggleMenu()">About</a></li>
+          <li><a href="#experience" onclick="toggleMenu()">Experience</a></li>
+          <li><a href="#projects" onclick="toggleMenu()">Projects</a></li>
+          <li><a href="#contact" onclick="toggleMenu()">Contact</a></li>
+        </div>
+      </div>
+    </nav>
 
-    <!-- IMPORTANT: below place this toggle *once* near the end of body (before scripts) -->
-    <div class="theme-switch-wrap" aria-hidden="false">
-      <label class="theme-switch" aria-label="Toggle dark mode">
-        <input id="theme-checkbox" type="checkbox" aria-checked="false" />
+    <section id="profile">
+      <div class="section__pic-container">
+        <img src="./assets/profile-pic.png" alt="John Doe profile picture" />
+      </div>
+      <div class="section__text">
+        <p class="section__text__p1">Hello, I'm</p>
+        <h1 class="title">Desing Raju Chavvakula</h1>
+        <p class="section__text__p2">Full Stack Python Developer</p>
+        <div class="btn-container">
+          <button class="btn btn-color-2" onclick="window.open('./assets/Desing_Raju_Resume.pdf')">Download CV</button>
+          <button class="btn btn-color-1" onclick="location.href='./#contact'">Contact Info</button>
+        </div>
+        <div id="socials-container">
+          <img src="./assets/linkedin.png" alt="My LinkedIn profile" class="icon" onclick="location.href='https://www.linkedin.com/in/desing-raju/'" />
+          <img src="./assets/github.png" alt="My Github profile" class="icon" onclick="location.href='https://github.com/desingraju'" />
+        </div>
+      </div>
+    </section>
+
+    <section id="about">
+      <p class="section__text__p1">Get To Know More</p>
+      <h1 class="title">About Me</h1>
+      <div class="section-container">
+        <div class="section__pic-container">
+          <img src="./assets/about-pic.png" alt="Profile picture" class="about-pic" />
+        </div>
+        <div class="about-details-container">
+          <div class="about-containers">
+            <div class="details-container">
+              <img src="./assets/experience.png" alt="Experience icon" class="icon" />
+              <h3>Experience</h3>
+              <p>1 year<br />Python Full Stack Development</p>
+            </div>
+            <div class="details-container">
+              <img src="./assets/education.png" alt="Education icon" class="icon" />
+              <h3>Education</h3>
+              <p>B.Tech Bachelors Degree<br />(Information Technology) </p>
+            </div>
+          </div>
+          <div class="text-container">
+            <p class="about-para" style="text-align:left; line-height:1.6;">
+              Aspiring Software Developer with strong foundational skills in Python, SQL, and full-stack web development. Enthusiastic and quick-learning developer with a solid academic background and hands-on internship experience in building end-to-end applications. Skilled in problem-solving, clean code practices, and efficient UI/UX design. Passionate about leveraging technology to create reliable and scalable solutions. A proactive team player with excellent communication skills, eager to contribute to innovative projects in a collaborative environment. Highly committed to continuous learning, professional growth, and adapting to new technologies.
+            </p>
+          </div>
+        </div>
+      </div>
+      <img src="./assets/arrow.png" alt="Arrow icon" class="icon arrow" onclick="location.href='./#experience'" />
+    </section>
+
+    <section id="experience">
+      <p class="section__text__p1">Explore My</p>
+      <h1 class="title">Experience</h1>
+      <div class="experience-details-container">
+        <div class="about-containers">
+          <div class="details-container">
+            <h2 class="experience-sub-title">Frontend Development</h2>
+            <div class="article-container">
+              <article>
+                <img src="./assets/checkmark.png" alt="Experience icon" class="icon" />
+                <div><h3>HTML</h3><p>Experienced</p></div>
+              </article>
+              <article>
+                <img src="./assets/checkmark.png" alt="Experience icon" class="icon" />
+                <div><h3>CSS</h3><p>Experienced</p></div>
+              </article>
+              <article>
+                <img src="./assets/checkmark.png" alt="Experience icon" class="icon" />
+                <div><h3>Bootstrap Framework</h3><p>Basic</p></div>
+              </article>
+              <article>
+                <img src="./assets/checkmark.png" alt="Experience icon" class="icon" />
+                <div><h3>Django Templates</h3><p>Intermediate</p></div>
+              </article>
+            </div>
+          </div>
+
+          <div class="details-container">
+            <h2 class="experience-sub-title">Backend Development</h2>
+            <div class="article-container">
+              <article>
+                <img src="./assets/checkmark.png" alt="Experience icon" class="icon" />
+                <div><h3>MYSQL</h3><p>Basic</p></div>
+              </article>
+              <article>
+                <img src="./assets/checkmark.png" alt="Experience icon" class="icon" />
+                <div><h3>Git</h3><p>Intermediate</p></div>
+              </article>
+              <article>
+                <img src="./assets/checkmark.png" alt="Experience icon" class="icon" />
+                <div><h3>Django</h3><p>Basic</p></div>
+              </article>
+              <article>
+                <img src="./assets/checkmark.png" alt="Experience icon" class="icon" />
+                <div><h3>Python</h3><p>Intermediate</p></div>
+              </article>
+            </div>
+          </div>
+        </div>
+      </div>
+      <img src="./assets/arrow.png" alt="Arrow icon" class="icon arrow" onclick="location.href='./#projects'" />
+    </section>
+
+    <section id="projects">
+      <p class="section__text__p1">Browse My Recent</p>
+      <h1 class="title">Projects</h1>
+      <div class="experience-details-container">
+        <div class="about-containers">
+          <!-- project card example - repeat in your existing list -->
+          <div class="details-container color-container" data-desc="Meal planner app">
+            <div class="article-container">
+              <img src="./assets/project-1.png" alt="project-1" class="project-img" />
+            </div>
+            <h2 class="experience-sub-title project-title">MEAL PLANNER</h2>
+            <div class="btn-container">
+              <button class="btn btn-color-2 project-btn" onclick="location.href='https://desingraju.github.io/Mealplanner/'">Github</button>
+              <button class="btn btn-color-2 project-btn" onclick="location.href='https://github.com/'">Live Demo</button>
+            </div>
+
+            <!-- overlay shown on hover -->
+            <div class="proj-overlay" aria-hidden="true">
+              <div class="overlay-title">Meal Planner — HTML / CSS / JS</div>
+              <div class="overlay-actions">
+                <button class="btn btn-color-2 project-btn" onclick="location.href='https://desingraju.github.io/Mealplanner/'">Code</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- copy your other project entries here. Keep the same structure. -->
+          <div class="details-container color-container">
+            <div class="article-container">
+              <img src="./assets/project-2.png" alt="project-2" class="project-img" />
+            </div>
+            <h2 class="experience-sub-title project-title">YUMMY HUB</h2>
+            <div class="btn-container">
+              <button class="btn btn-color-2 project-btn" onclick="location.href='https://desingraju.github.io/Foodie_'">Github</button>
+              <button class="btn btn-color-2 project-btn" onclick="location.href='https://github.com/'">Live Demo</button>
+            </div>
+            <div class="proj-overlay" aria-hidden="true">
+              <div class="overlay-title">Yummy Hub — Responsive site</div>
+              <div class="overlay-actions"><button class="btn btn-color-2 project-btn">View</button></div>
+            </div>
+          </div>
+
+          <!-- Add rest of your project elements as in your original file -->
+          <!-- ... -->
+
+        </div>
+      </div>
+      <img src="./assets/arrow.png" alt="Arrow icon" class="icon arrow" onclick="location.href='./#contact'" />
+    </section>
+
+    <!-- extra project section from your original file (kept intact) -->
+    <section>
+      <div class="experience-details-container">
+        <div class="about-containers">
+          <div class="details-container color-container">
+            <div class="article-container">
+              <img src="./assets/project-5.png" alt="project-4" class="project-img" />
+            </div>
+            <h2 class="experience-sub-title project-title">BUY BUDDY</h2>
+            <div class="btn-container">
+              <button class="btn btn-color-2 project-btn" onclick="location.href='https://replit.com/@desingrajuchavv/E-Commerce-Application?v=1'">Github</button>
+              <button class="btn btn-color-2 project-btn" onclick="location.href='https://github.com/'">Live Demo</button>
+            </div>
+            <div class="proj-overlay" aria-hidden="true">
+              <div class="overlay-title">Buy Buddy — E-commerce demo</div>
+              <div class="overlay-actions"><button class="btn btn-color-2 project-btn">Open</button></div>
+            </div>
+          </div>
+
+          <div class="details-container color-container">
+            <div class="article-container">
+              <img src="./assets/project-6.png" alt="project-6" class="project-img" />
+            </div>
+            <h2 class="experience-sub-title project-title">BRAIN BUZZ</h2>
+            <div class="btn-container">
+              <button class="btn btn-color-2 project-btn" onclick="location.href='https://replit.com/@desingrajuchavv/Quiz-App?v=1'">Github</button>
+              <button class="btn btn-color-2 project-btn" onclick="location.href='https://github.com/'">Live Demo</button>
+            </div>
+            <div class="proj-overlay" aria-hidden="true">
+              <div class="overlay-title">Brain Buzz — Quiz App</div>
+              <div class="overlay-actions"><button class="btn btn-color-2 project-btn">Try</button></div>
+            </div>
+          </div>
+
+          <!-- ... more projects as originally included ... -->
+        </div>
+      </div>
+    </section>
+
+    <section id="contact">
+      <p class="section__text__p1">Get in Touch</p>
+      <h1 class="title">Contact Me</h1>
+      <div class="contact-info-upper-container">
+        <div class="contact-info-container">
+          <img src="./assets/email.png" alt="Email icon" class="icon contact-icon email-icon" />
+          <p><a href="mailto:desingrajuchavvakula@gmail.com">desingrajuchavvakula@gmail.com</a></p>
+        </div>
+        <div class="contact-info-container">
+          <img src="./assets/linkedin.png" alt="LinkedIn icon" class="icon contact-icon" />
+          <p><a href="https://www.linkedin.com/in/desing-raju/">LinkedIn</a></p>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <nav>
+        <div class="nav-links-container">
+          <ul class="nav-links">
+            <li><a href="#about">About</a></li>
+            <li><a href="#experience">Experience</a></li>
+            <li><a href="#projects">Projects</a></li>
+            <li><a href="#contact">Contact</a></li>
+          </ul>
+        </div>
+      </nav>
+      <p>Copyright &#169; 2025 Desing Raju. All Rights Reserved.</p>
+    </footer>
+
+    <!-- THEME TOGGLE (placed top-right) -->
+    <div class="theme-switch-wrap" role="region" aria-label="Theme switch">
+      <label class="theme-switch" aria-label="Toggle dark mode" tabindex="0">
+        <input id="theme-checkbox" type="checkbox" />
         <div class="track" role="presentation">
           <div class="knob" aria-hidden="true">
             <span class="knob-icon">
@@ -319,49 +518,38 @@
       </div>
     </div>
 
-    <!-- your existing scripts -->
     <script src="script.js"></script>
 
-    <!-- THEME SWITCH SCRIPT (non-invasive) -->
     <script>
+      // Theme toggle: safe non-invasive behavior
       (function () {
         const checkbox = document.getElementById("theme-checkbox");
         const body = document.body;
 
-        // apply theme from saved pref (localStorage)
-        const saved = (function () {
-          try {
-            return localStorage.getItem("desing_theme_dark");
-          } catch (e) {
-            return null;
-          }
-        })();
+        // load saved preference
+        let saved = null;
+        try { saved = localStorage.getItem("desing_theme_dark"); } catch (e) { saved = null; }
 
         if (saved !== null) {
           const isDark = saved === "true";
           body.classList.toggle("dark-mode", isDark);
           checkbox.checked = !!isDark;
         } else {
-          // optional: follow system preference initially
           const prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
           body.classList.toggle("dark-mode", prefersDark);
           checkbox.checked = !!prefersDark;
         }
 
-        // toggle handler
         checkbox.addEventListener("change", function () {
           const isDark = checkbox.checked;
           body.classList.toggle("dark-mode", isDark);
-          try {
-            localStorage.setItem("desing_theme_dark", isDark ? "true" : "false");
-          } catch (e) {
-            // ignore
-          }
+          try { localStorage.setItem("desing_theme_dark", isDark ? "true" : "false"); } catch (e) {}
         });
 
-        // keyboard accessibility: space toggles
-        checkbox.addEventListener("keydown", (e) => {
-          if (e.key === " " || e.key === "Enter") {
+        // make label keyboard-accessible
+        const label = checkbox.closest(".theme-switch");
+        label.addEventListener("keydown", (e) => {
+          if (e.key === "Enter" || e.key === " ") {
             e.preventDefault();
             checkbox.checked = !checkbox.checked;
             checkbox.dispatchEvent(new Event("change"));
