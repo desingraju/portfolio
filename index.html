@@ -7,14 +7,12 @@
     <title>My Portfolio</title>
     <link rel="stylesheet" href="style.css" />
     <link rel="stylesheet" href="mediaqueries.css" />
-    <!-- Minimal added styles for theme + effort tooltip (safe to paste into head) -->
-    <style>
-      .about-para {
-        text-align: left;
-        line-height: 1.6;
-      }
 
-      /* ============= Theme variables ============= */
+    <!-- Minimal added styles for theme + project-arrow popup -->
+    <style>
+      .about-para { text-align: left; line-height: 1.6; }
+
+      /* ========== Theme variables ========== */
       :root{
         --bg: #ffffff;
         --text: #0b1220;
@@ -22,8 +20,9 @@
         --card-bg: rgba(255,255,255,0.6);
         --glass-border: rgba(0,0,0,0.06);
         --accent: #5b21b6;
+        --sun-color: #f6c94d; /* for sun icon */
+        --moon-color: #cbd5e1; /* for moon stroke */
       }
-      /* dark theme variables */
       .dark-theme{
         --bg: #071021;
         --text: #e6eef8;
@@ -31,55 +30,53 @@
         --card-bg: rgba(18,22,30,0.6);
         --glass-border: rgba(255,255,255,0.06);
         --accent: #6ee7b7;
+        --sun-color: #f6c94d;
+        --moon-color: #f1f5f9;
       }
+      html, body { background-color: var(--bg); color: var(--text); }
 
-      /* apply theme background to body/html */
-      html, body {
-        background-color: var(--bg);
-        color: var(--text);
-      }
-
-      /* theme toggle minimal styling */
+      /* Theme toggle simple */
       .theme-toggle{
-        display:inline-flex;
-        align-items:center;
-        justify-content:center;
-        gap:6px;
-        background:transparent;
-        color:var(--muted);
-        border-radius:8px;
-        cursor:pointer;
-        padding:6px;
-        border: none;
+        display:inline-flex; align-items:center; justify-content:center;
+        gap:6px; background:transparent; color:var(--muted);
+        border-radius:8px; cursor:pointer; padding:6px; border:none;
       }
       .theme-toggle svg{ display:block; }
 
-      /* Effort pill badge for project cards (absolute positioned) */
-      .details-container {
-        position: relative; /* ensures badge/tooltip is positioned relative to card */
-      }
-      .details-container .effort-badge {
-        position: absolute;
-        right: 12px;
-        bottom: 12px;
-        font-size: 12px;
-        padding: 6px 8px;
-        border-radius: 8px;
-        background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02));
-        border: 1px solid var(--glass-border);
-        backdrop-filter: blur(6px);
-        color: var(--text);
-        pointer-events: none;
-        z-index: 4;
-        box-shadow: 0 6px 18px rgba(0,0,0,0.06);
-      }
+      /* ========== Project arrow (top-right) and tooltip ========== */
+      /* ensure project card positioned relative so arrow can be absolute */
+      .details-container { position: relative; }
 
-      /* tooltip (uses data-effort attribute) */
-      .details-container[data-effort]::after{
-        content: attr(data-effort);
+      /* small arrow button in top-right of each project card */
+      .project-arrow {
         position: absolute;
-        left: 50%;
-        transform: translate(-50%, 10px) scale(.98);
+        top: 10px;
+        right: 10px;
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+        border: 1px solid var(--glass-border);
+        background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        cursor: pointer;
+        z-index: 8;
+        padding: 6px;
+        transition: transform .14s ease, box-shadow .14s;
+      }
+      .project-arrow:focus { outline: 2px solid var(--accent); transform: translateY(-2px); }
+      .project-arrow:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.08); }
+
+      /* Arrow svg color */
+      .project-arrow svg { width:18px; height:18px; display:block; }
+
+      /* tooltip container (hidden by default) */
+      .arrow-tooltip {
+        position: absolute;
+        top: -8px; /* will be adjusted with transform */
+        right: 50%;
+        transform: translate(50%, -100%) scale(.95);
         background: var(--card-bg);
         color: var(--text);
         padding: 8px 10px;
@@ -89,38 +86,82 @@
         border: 1px solid var(--glass-border);
         opacity: 0;
         pointer-events: none;
-        transition: opacity .16s ease, transform .16s ease;
-        z-index: 6;
+        transition: opacity .14s ease, transform .14s ease;
         backdrop-filter: blur(6px);
-      }
-      .details-container[data-effort]:hover::after,
-      .details-container[data-effort]:focus-within::after{
-        opacity: 1;
-        transform: translate(-50%, -12px) scale(1);
+        z-index: 9;
       }
 
-      /* slight override for badge in dark theme so it remains readable */
-      .dark-theme .details-container .effort-badge {
-        background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.12));
+      /* show tooltip when hovering or focusing the arrow */
+      .project-arrow:hover + .arrow-tooltip,
+      .project-arrow:focus + .arrow-tooltip {
+        opacity: 1;
+        transform: translate(50%, -120%) scale(1);
+        pointer-events: auto;
+      }
+
+      /* hide the previously visible effort-badge if present (user wanted only popup) */
+      .details-container .effort-badge { display: none !important; }
+
+      /* small tweak for dark theme so tooltip and arrow remain visible */
+      .dark-theme .arrow-tooltip {
+        background: var(--card-bg);
         color: var(--text);
         border: 1px solid var(--glass-border);
       }
 
-      /* keep toggle visible on small screens if needed */
-      @media (max-width:520px){
-        .theme-toggle{ padding:4px }
+      /* ========== Theme toggle icon styles ==========
+         We'll include both sun & moon svgs and show the right one via CSS */
+      .icon-sun { display: inline-block; }
+      .icon-moon { display: none; }
+
+      /* in dark mode show moon, hide sun */
+      .dark-theme .icon-sun { display: none; }
+      .dark-theme .icon-moon { display: inline-block; }
+
+      /* sun icon color */
+      .theme-toggle .icon-sun svg path, .theme-toggle .icon-sun svg circle {
+        fill: var(--sun-color);
+        stroke: var(--sun-color);
       }
+      /* moon icon color */
+      .theme-toggle .icon-moon svg path {
+        stroke: var(--moon-color);
+        fill: none;
+      }
+
+      /* keep toggle small on mobile */
+      @media (max-width:520px){ .theme-toggle{ padding:4px } }
     </style>
   </head>
+
   <body>
     <nav id="desktop-nav">
       <div class="logo">Desing Raju Chavvakula</div>
 
-      <!-- THEME TOGGLE (desktop) - add this button -->
+      <!-- THEME TOGGLE (desktop) - contains both sun and moon icons; CSS shows correct one -->
       <button id="theme-toggle-desktop" class="theme-toggle" aria-label="Toggle theme" title="Toggle theme" type="button" style="margin-left:12px;">
-        <svg id="theme-icon-desktop" width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden>
-          <path id="theme-icon-path-desktop" d="M12 3v2M12 19v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M3 12h2M19 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4M12 7a5 5 0 100 10 5 5 0 000-10z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
+        <span class="icon-sun" aria-hidden>
+          <!-- sun (filled yellow) -->
+          <svg width="20" height="20" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden>
+            <circle cx="12" cy="12" r="4" fill="var(--sun-color)"></circle>
+            <g stroke="var(--sun-color)" stroke-width="1.3" stroke-linecap="round">
+              <path d="M12 2v2"></path>
+              <path d="M12 20v2"></path>
+              <path d="M4.2 4.2l1.4 1.4"></path>
+              <path d="M18.4 18.4l1.4 1.4"></path>
+              <path d="M2 12h2"></path>
+              <path d="M20 12h2"></path>
+              <path d="M4.2 19.8l1.4-1.4"></path>
+              <path d="M18.4 5.6l1.4-1.4"></path>
+            </g>
+          </svg>
+        </span>
+        <span class="icon-moon" aria-hidden>
+          <!-- half moon -->
+          <svg width="20" height="20" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden>
+            <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" stroke="var(--moon-color)" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          </svg>
+        </span>
       </button>
 
       <div>
@@ -132,14 +173,32 @@
         </ul>
       </div>
     </nav>
+
     <nav id="hamburger-nav">
       <div class="logo">Desing Raju</div>
 
-      <!-- THEME TOGGLE (mobile/hamburger) - add this button -->
+      <!-- THEME TOGGLE (mobile/hamburger) -->
       <button id="theme-toggle-mobile" class="theme-toggle" aria-label="Toggle theme" title="Toggle theme" type="button" style="border:0;background:transparent;padding:6px;">
-        <svg id="theme-icon-mobile" width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden>
-          <path id="theme-icon-path-mobile" d="M12 3v2M12 19v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M3 12h2M19 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4M12 7a5 5 0 100 10 5 5 0 000-10z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
+        <span class="icon-sun" aria-hidden>
+          <svg width="18" height="18" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden>
+            <circle cx="12" cy="12" r="4" fill="var(--sun-color)"></circle>
+            <g stroke="var(--sun-color)" stroke-width="1.2" stroke-linecap="round">
+              <path d="M12 2v2"></path>
+              <path d="M12 20v2"></path>
+              <path d="M4.2 4.2l1.4 1.4"></path>
+              <path d="M18.4 18.4l1.4 1.4"></path>
+              <path d="M2 12h2"></path>
+              <path d="M20 12h2"></path>
+              <path d="M4.2 19.8l1.4-1.4"></path>
+              <path d="M18.4 5.6l1.4-1.4"></path>
+            </g>
+          </svg>
+        </span>
+        <span class="icon-moon" aria-hidden>
+          <svg width="18" height="18" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden>
+            <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" stroke="var(--moon-color)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          </svg>
+        </span>
       </button>
 
       <div class="hamburger-menu">
@@ -156,6 +215,7 @@
         </div>
       </div>
     </nav>
+
     <section id="profile">
       <div class="section__pic-container">
         <img src="./assets/profile-pic.png" alt="John Doe profile picture" />
@@ -165,60 +225,32 @@
         <h1 class="title">Desing Raju Chavvakula</h1>
         <p class="section__text__p2">Full Stack Python Developer</p>
         <div class="btn-container">
-          <button
-            class="btn btn-color-2"
-            onclick="window.open('./assets/Desing_Raju_Resume.pdf')"
-          >
-            Download CV
-          </button>
-          <button class="btn btn-color-1" onclick="location.href='./#contact'">
-            Contact Info
-          </button>
+          <button class="btn btn-color-2" onclick="window.open('./assets/Desing_Raju_Resume.pdf')">Download CV</button>
+          <button class="btn btn-color-1" onclick="location.href='./#contact'">Contact Info</button>
         </div>
         <div id="socials-container">
-          <img
-            src="./assets/linkedin.png"
-            alt="My LinkedIn profile"
-            class="icon"
-            onclick="location.href='https://www.linkedin.com/in/desing-raju/'"
-          />
-          <img
-            src="./assets/github.png"
-            alt="My Github profile"
-            class="icon"
-            onclick="location.href='https://github.com/desingraju'"
-          />
+          <img src="./assets/linkedin.png" alt="My LinkedIn profile" class="icon" onclick="location.href='https://www.linkedin.com/in/desing-raju/'" />
+          <img src="./assets/github.png" alt="My Github profile" class="icon" onclick="location.href='https://github.com/desingraju'" />
         </div>
       </div>
     </section>
+
     <section id="about">
       <p class="section__text__p1">Get To Know More</p>
       <h1 class="title">About Me</h1>
       <div class="section-container">
         <div class="section__pic-container">
-          <img
-            src="./assets/about-pic.png"
-            alt="Profile picture"
-            class="about-pic"
-          />
+          <img src="./assets/about-pic.png" alt="Profile picture" class="about-pic" />
         </div>
         <div class="about-details-container">
           <div class="about-containers">
             <div class="details-container">
-              <img
-                src="./assets/experience.png"
-                alt="Experience icon"
-                class="icon"
-              />
+              <img src="./assets/experience.png" alt="Experience icon" class="icon" />
               <h3>Experience</h3>
               <p>1 year<br />Python Full Stack Development</p>
             </div>
             <div class="details-container">
-              <img
-                src="./assets/education.png"
-                alt="Education icon"
-                class="icon"
-              />
+              <img src="./assets/education.png" alt="Education icon" class="icon" />
               <h3>Education</h3>
               <p>B.Tech Bachelors Degree<br />(Information Technology) </p>
             </div>
@@ -229,13 +261,10 @@
           </div>
         </div>
       </div>
-      <img
-        src="./assets/arrow.png"
-        alt="Arrow icon"
-        class="icon arrow"
-        onclick="location.href='./#experience'"
-      />
+
+      <img src="./assets/arrow.png" alt="Arrow icon" class="icon arrow" onclick="location.href='./#experience'" />
     </section>
+
     <section id="experience">
       <p class="section__text__p1">Explore My</p>
       <h1 class="title">Experience</h1>
@@ -245,399 +274,242 @@
             <h2 class="experience-sub-title">Frontend Development</h2>
             <div class="article-container">
               <article>
-                <img
-                  src="./assets/checkmark.png"
-                  alt="Experience icon"
-                  class="icon"
-                />
+                <img src="./assets/checkmark.png" alt="Experience icon" class="icon" />
                 <div>
-                  <h3>HTML</h3>
-                  <p>Experienced</p>
+                  <h3>HTML</h3><p>Experienced</p>
                 </div>
               </article>
               <article>
-                <img
-                  src="./assets/checkmark.png"
-                  alt="Experience icon"
-                  class="icon"
-                />
+                <img src="./assets/checkmark.png" alt="Experience icon" class="icon" />
                 <div>
-                  <h3>CSS</h3>
-                  <p>Experienced</p>
+                  <h3>CSS</h3><p>Experienced</p>
                 </div>
               </article>
               <article>
-                <img
-                  src="./assets/checkmark.png"
-                  alt="Experience icon"
-                  class="icon"
-                />
+                <img src="./assets/checkmark.png" alt="Experience icon" class="icon" />
                 <div>
-                  <h3>Bootstrap Framework</h3>
-                  <p>Basic</p>
+                  <h3>Bootstrap Framework</h3><p>Basic</p>
                 </div>
               </article>
               <article>
-                <img
-                  src="./assets/checkmark.png"
-                  alt="Experience icon"
-                  class="icon"
-                />
+                <img src="./assets/checkmark.png" alt="Experience icon" class="icon" />
                 <div>
-                  <h3>Django Templates</h3>
-                  <p>Intermediate</p>
+                  <h3>Django Templates</h3><p>Intermediate</p>
                 </div>
               </article>
             </div>
           </div>
+
           <div class="details-container">
             <h2 class="experience-sub-title">Backend Development</h2>
             <div class="article-container">
               <article>
-                <img
-                  src="./assets/checkmark.png"
-                  alt="Experience icon"
-                  class="icon"
-                />
-                <div>
-                  <h3>MYSQL</h3>
-                  <p>Basic</p>
-                </div>
+                <img src="./assets/checkmark.png" alt="Experience icon" class="icon" />
+                <div><h3>MYSQL</h3><p>Basic</p></div>
               </article>
               <article>
-                <img
-                  src="./assets/checkmark.png"
-                  alt="Experience icon"
-                  class="icon"
-                />
-                <div>
-                  <h3>Git</h3>
-                  <p>Intermediate</p>
-                </div>
+                <img src="./assets/checkmark.png" alt="Experience icon" class="icon" />
+                <div><h3>Git</h3><p>Intermediate</p></div>
               </article>
               <article>
-                <img
-                  src="./assets/checkmark.png"
-                  alt="Experience icon"
-                  class="icon"
-                />
-                <div>
-                  <h3>Django</h3>
-                  <p>Basic</p>
-                </div>
+                <img src="./assets/checkmark.png" alt="Experience icon" class="icon" />
+                <div><h3>Django</h3><p>Basic</p></div>
               </article>
               <article>
-                <img
-                  src="./assets/checkmark.png"
-                  alt="Experience icon"
-                  class="icon"
-                />
-                <div>
-                  <h3>Python</h3>
-                  <p>Intermediate</p>
-                </div>
+                <img src="./assets/checkmark.png" alt="Experience icon" class="icon" />
+                <div><h3>Python</h3><p>Intermediate</p></div>
               </article>
             </div>
           </div>
+
         </div>
       </div>
-      <img
-        src="./assets/arrow.png"
-        alt="Arrow icon"
-        class="icon arrow"
-        onclick="location.href='./#projects'"
-      />
+
+      <img src="./assets/arrow.png" alt="Arrow icon" class="icon arrow" onclick="location.href='./#projects'" />
     </section>
+
     <section id="projects">
       <p class="section__text__p1">Browse My Recent</p>
       <h1 class="title">Projects</h1>
       <div class="experience-details-container">
         <div class="about-containers">
-          <div class="details-container color-container">
+
+          <!-- MEAL PLANNER -->
+          <div class="details-container color-container" data-effort="Effort: 8 hours">
             <div class="article-container">
-              <img
-                src="./assets/project-1.png"
-                alt="project-1"
-                class="project-img"
-              />
+              <img src="./assets/project-1.png" alt="project-1" class="project-img" />
             </div>
             <h2 class="experience-sub-title project-title">MEAL PLANNER</h2>
             <div class="btn-container">
-              <button
-                class="btn btn-color-2 project-btn"
-                onclick="location.href='https://desingraju.github.io/Mealplanner/'"
-              >
-                Github
-              </button>
-              <button
-                class="btn btn-color-2 project-btn"
-                onclick="location.href='https://github.com/'"
-              >
-                Live Demo
-              </button>
+              <button class="btn btn-color-2 project-btn" onclick="location.href='https://desingraju.github.io/Mealplanner/'">Github</button>
+              <button class="btn btn-color-2 project-btn" onclick="location.href='https://github.com/'">Live Demo</button>
             </div>
+
+            <!-- project arrow (hover this to see effort popup) -->
+            <button class="project-arrow" aria-label="Show effort for MEAL PLANNER"></button>
+            <!-- tooltip element (JS will leave the data-effort attribute text as content via CSS ::after
+                 but we also include actual tooltip for better positioning with arrow) -->
+            <div class="arrow-tooltip" aria-hidden>Effort: 8 hours</div>
           </div>
-          <div class="details-container color-container">
+
+          <!-- YUMMY HUB -->
+          <div class="details-container color-container" data-effort="Effort: 6 hours">
             <div class="article-container">
-              <img
-                src="./assets/project-2.png"
-                alt="project-2"
-                class="project-img"
-              />
+              <img src="./assets/project-2.png" alt="project-2" class="project-img" />
             </div>
             <h2 class="experience-sub-title project-title">YUMMY HUB</h2>
             <div class="btn-container">
-              <button
-                class="btn btn-color-2 project-btn"
-                onclick="location.href='https://desingraju.github.io/Foodie_'"
-              >
-                Github
-              </button>
-              <button
-                class="btn btn-color-2 project-btn"
-                onclick="location.href='https://github.com/'"
-              >
-                Live Demo
-              </button>
+              <button class="btn btn-color-2 project-btn" onclick="location.href='https://desingraju.github.io/Foodie_'">Github</button>
+              <button class="btn btn-color-2 project-btn" onclick="location.href='https://github.com/'">Live Demo</button>
             </div>
+            <button class="project-arrow" aria-label="Show effort for YUMMY HUB"></button>
+            <div class="arrow-tooltip" aria-hidden>Effort: 6 hours</div>
           </div>
-          <div class="details-container color-container">
+
+          <!-- THE BIG-DAY -->
+          <div class="details-container color-container" data-effort="Effort: 10 hours">
             <div class="article-container">
-              <img
-                src="./assets/project-4.png"
-                alt="project-4"
-                class="project-img"
-              />
+              <img src="./assets/project-4.png" alt="project-4" class="project-img" />
             </div>
             <h2 class="experience-sub-title project-title">THE BIG-DAY</h2>
             <div class="btn-container">
-              <button
-                class="btn btn-color-2 project-btn"
-                onclick="location.href='https://desingraju.github.io/TimerforEvent/'"
-              >
-                Github
-              </button>
-              <button
-                class="btn btn-color-2 project-btn"
-                onclick="location.href='https://github.com/'"
-              >
-                Live Demo
-              </button>
+              <button class="btn btn-color-2 project-btn" onclick="location.href='https://desingraju.github.io/TimerforEvent/'">Github</button>
+              <button class="btn btn-color-2 project-btn" onclick="location.href='https://github.com/'">Live Demo</button>
             </div>
+            <button class="project-arrow" aria-label="Show effort for THE BIG-DAY"></button>
+            <div class="arrow-tooltip" aria-hidden>Effort: 10 hours</div>
           </div>
-          <div class="details-container color-container">
+
+          <!-- TRAVEL YARI -->
+          <div class="details-container color-container" data-effort="Effort: 8 hours">
             <div class="article-container">
-              <img
-                src="./assets/project-7.png"
-                alt="project-5"
-                class="project-img"
-              />
+              <img src="./assets/project-7.png" alt="project-5" class="project-img" />
             </div>
-             <h2 class="experience-sub-title project-title">TRAVEL YARI</h2>
+            <h2 class="experience-sub-title project-title">TRAVEL YARI</h2>
             <div class="btn-container">
-              <button
-                class="btn btn-color-2 project-btn"
-                onclick="location.href='https://desingraju.github.io/Travelyari/'"
-              >
-                Github
-              </button>
-              <button
-                class="btn btn-color-2 project-btn"
-                onclick="location.href='https://github.com/'"
-              >
-                Live Demo
-              </button>
+              <button class="btn btn-color-2 project-btn" onclick="location.href='https://desingraju.github.io/Travelyari/'">Github</button>
+              <button class="btn btn-color-2 project-btn" onclick="location.href='https://github.com/'">Live Demo</button>
             </div>
+            <button class="project-arrow" aria-label="Show effort for TRAVEL YARI"></button>
+            <div class="arrow-tooltip" aria-hidden>Effort: 8 hours</div>
           </div>
-          <div class="details-container color-container">
+
+          <!-- TRUST BANK -->
+          <div class="details-container color-container" data-effort="Effort: 18 hours">
             <div class="article-container">
-              <img
-                src="./assets/project-3.png"
-                alt="project-2"
-                class="project-img"
-              />
+              <img src="./assets/project-3.png" alt="project-2" class="project-img" />
             </div>
-              <h2 class="experience-sub-title project-title">TRUST BANK</h2>
+            <h2 class="experience-sub-title project-title">TRUST BANK</h2>
             <div class="btn-container">
-              <button
-                class="btn btn-color-2 project-btn"
-                onclick="location.href='https://replit.com/@desingrajuchavv/Bank-Application?v=1'"
-              >
-                Github
-              </button>
-              <button
-                class="btn btn-color-2 project-btn"
-                onclick="location.href='https://github.com/'"
-              >
-                Live Demo
-              </button>
+              <button class="btn btn-color-2 project-btn" onclick="location.href='https://replit.com/@desingrajuchavv/Bank-Application?v=1'">Github</button>
+              <button class="btn btn-color-2 project-btn" onclick="location.href='https://github.com/'">Live Demo</button>
             </div>
+            <button class="project-arrow" aria-label="Show effort for TRUST BANK"></button>
+            <div class="arrow-tooltip" aria-hidden>Effort: 18 hours</div>
           </div>
+
         </div>
       </div>
-      <img
-        src="./assets/arrow.png"
-        alt="Arrow icon"
-        class="icon arrow"
-        onclick="location.href='./#contact'"
-      />
-      </section>
+
+      <img src="./assets/arrow.png" alt="Arrow icon" class="icon arrow" onclick="location.href='./#contact'" />
+    </section>
+
+    <!-- second projects section -->
     <section>
-      <p class="section__text__p1"></p>
-      <h1 class="title"> </h1>
       <div class="experience-details-container">
         <div class="about-containers">
-          <div class="details-container color-container">
+
+          <!-- BUY BUDDY -->
+          <div class="details-container color-container" data-effort="Effort: 20 hours">
             <div class="article-container">
-              <img
-                src="./assets/project-5.png"
-                alt="project-4"
-                class="project-img"
-              />
+              <img src="./assets/project-5.png" alt="project-4" class="project-img" />
             </div>
             <h2 class="experience-sub-title project-title">BUY BUDDY</h2>
             <div class="btn-container">
-              <button
-                class="btn btn-color-2 project-btn"
-                onclick="location.href='https://replit.com/@desingrajuchavv/E-Commerce-Application?v=1'"
-              >
-                Github
-              </button>
-              <button
-                class="btn btn-color-2 project-btn"
-                onclick="location.href='https://github.com/'"
-              >
-                Live Demo
-              </button>
+              <button class="btn btn-color-2 project-btn" onclick="location.href='https://replit.com/@desingrajuchavv/E-Commerce-Application?v=1'">Github</button>
+              <button class="btn btn-color-2 project-btn" onclick="location.href='https://github.com/'">Live Demo</button>
             </div>
+            <button class="project-arrow" aria-label="Show effort for BUY BUDDY"></button>
+            <div class="arrow-tooltip" aria-hidden>Effort: 20 hours</div>
           </div>
-          <div class="details-container color-container">
+
+          <!-- BRAIN BUZZ -->
+          <div class="details-container color-container" data-effort="Effort: 6 hours">
             <div class="article-container">
-              <img
-                src="./assets/project-6.png"
-                alt="project-6"
-                class="project-img"
-              />
+              <img src="./assets/project-6.png" alt="project-6" class="project-img" />
             </div>
             <h2 class="experience-sub-title project-title">BRAIN BUZZ</h2>
             <div class="btn-container">
-              <button
-                class="btn btn-color-2 project-btn"
-                onclick="location.href='https://replit.com/@desingrajuchavv/Quiz-App?v=1'"
-              >
-                Github
-              </button>
-              <button
-                class="btn btn-color-2 project-btn"
-                onclick="location.href='https://github.com/'"
-              >
-                Live Demo
-              </button>
+              <button class="btn btn-color-2 project-btn" onclick="location.href='https://replit.com/@desingrajuchavv/Quiz-App?v=1'">Github</button>
+              <button class="btn btn-color-2 project-btn" onclick="location.href='https://github.com/'">Live Demo</button>
             </div>
-            </div>
-                <div class="details-container color-container">
-            <div class="article-container">
-              <img
-                src="./assets/project-8.png"
-                alt="project-2"
-                class="project-img"
-              />
-            </div>
-             <h2 class="experience-sub-title project-title">STAFF INFO</h2>
-            <div class="btn-container">
-              <button
-                class="btn btn-color-2 project-btn"
-                onclick="location.href='https://edms1.pythonanywhere.com/'"
-              >
-                Github
-              </button>
-              <button
-                class="btn btn-color-2 project-btn"
-                onclick="location.href='https://github.com/'"
-              >
-                Live Demo
-              </button>
-            </div>
+            <button class="project-arrow" aria-label="Show effort for BRAIN BUZZ"></button>
+            <div class="arrow-tooltip" aria-hidden>Effort: 6 hours</div>
           </div>
-          <div class="details-container color-container">
+
+          <!-- STAFF INFO -->
+          <div class="details-container color-container" data-effort="Effort: 14 hours">
             <div class="article-container">
-              <img
-                src="./assets/project-10.png"
-                alt="project-2"
-                class="project-img"
-              />
+              <img src="./assets/project-8.png" alt="project-2" class="project-img" />
             </div>
-             <h2 class="experience-sub-title project-title">CAMPUS CLOUD</h2>
+            <h2 class="experience-sub-title project-title">STAFF INFO</h2>
             <div class="btn-container">
-              <button
-                class="btn btn-color-2 project-btn"
-                onclick="location.href='https://raju.pythonanywhere.com/'"
-              >
-                Github
-              </button>
-              <button
-                class="btn btn-color-2 project-btn"
-                onclick="location.href='https://github.com/'"
-              >
-                Live Demo
-              </button>
+              <button class="btn btn-color-2 project-btn" onclick="location.href='https://edms1.pythonanywhere.com/'">Github</button>
+              <button class="btn btn-color-2 project-btn" onclick="location.href='https://github.com/'">Live Demo</button>
             </div>
+            <button class="project-arrow" aria-label="Show effort for STAFF INFO"></button>
+            <div class="arrow-tooltip" aria-hidden>Effort: 14 hours</div>
           </div>
-          <div class="details-container color-container">
+
+          <!-- CAMPUS CLOUD -->
+          <div class="details-container color-container" data-effort="Effort: 22 hours">
             <div class="article-container">
-              <img
-                src="./assets/project-9.png"
-                alt="project-2"
-                class="project-img"
-              />
+              <img src="./assets/project-10.png" alt="project-2" class="project-img" />
+            </div>
+            <h2 class="experience-sub-title project-title">CAMPUS CLOUD</h2>
+            <div class="btn-container">
+              <button class="btn btn-color-2 project-btn" onclick="location.href='https://raju.pythonanywhere.com/'">Github</button>
+              <button class="btn btn-color-2 project-btn" onclick="location.href='https://github.com/'">Live Demo</button>
+            </div>
+            <button class="project-arrow" aria-label="Show effort for CAMPUS CLOUD"></button>
+            <div class="arrow-tooltip" aria-hidden>Effort: 22 hours</div>
+          </div>
+
+          <!-- FORM TO CV -->
+          <div class="details-container color-container" data-effort="Effort: 16 hours">
+            <div class="article-container">
+              <img src="./assets/project-9.png" alt="project-2" class="project-img" />
             </div>
             <h2 class="experience-sub-title project-title">FORM TO CV</h2>
             <div class="btn-container">
-              <button
-                class="btn btn-color-2 project-btn"
-                onclick="location.href='https://sendresume.pythonanywhere.com/'"
-              >
-                Github
-              </button>
-              <button
-                class="btn btn-color-2 project-btn"
-                onclick="location.href='https://github.com/'"
-              >
-                Live Demo
-              </button>
+              <button class="btn btn-color-2 project-btn" onclick="location.href='https://sendresume.pythonanywhere.com/'">Github</button>
+              <button class="btn btn-color-2 project-btn" onclick="location.href='https://github.com/'">Live Demo</button>
             </div>
+            <button class="project-arrow" aria-label="Show effort for FORM TO CV"></button>
+            <div class="arrow-tooltip" aria-hidden>Effort: 16 hours</div>
           </div>
+
         </div>
       </div>
-      <img
-        src="./assets/arrow.png"
-        alt="Arrow icon"
-        class="icon arrow"
-        onclick="location.href='./#contact'"
-      />
+
+      <img src="./assets/arrow.png" alt="Arrow icon" class="icon arrow" onclick="location.href='./#contact'" />
     </section>
+
     <section id="contact">
       <p class="section__text__p1">Get in Touch</p>
       <h1 class="title">Contact Me</h1>
       <div class="contact-info-upper-container">
         <div class="contact-info-container">
-          <img
-            src="./assets/email.png"
-            alt="Email icon"
-            class="icon contact-icon email-icon"
-          />
+          <img src="./assets/email.png" alt="Email icon" class="icon contact-icon email-icon" />
           <p><a href="mailto:desingrajuchavvakula@gmail.com">desingrajuchavvakula@gmail.com</a></p>
         </div>
         <div class="contact-info-container">
-          <img
-            src="./assets/linkedin.png"
-            alt="LinkedIn icon"
-            class="icon contact-icon"
-          />
+          <img src="./assets/linkedin.png" alt="LinkedIn icon" class="icon contact-icon" />
           <p><a href="https://www.linkedin.com/in/desing-raju/">LinkedIn</a></p>
         </div>
       </div>
     </section>
+
     <footer>
       <nav>
         <div class="nav-links-container">
@@ -652,85 +524,77 @@
       <p>Copyright &#169; 2025 Desing Raju. All Rights Reserved.</p>
     </footer>
 
-    <!-- keep your existing script.js if you have other logic; below script only adds theme + effort behavior -->
+    <!-- SCRIPT: theme toggle, accessibility, and populate arrow tooltips from data-effort -->
     <script>
-      /* THEME TOGGLE (persisted) */
       (function(){
         const root = document.documentElement;
         const KEY = 'site-theme';
-        // apply stored theme on load
+        // initial theme
         const stored = localStorage.getItem(KEY);
         if(stored === 'dark') root.classList.add('dark-theme');
 
-        // desktop toggle
-        const btnDesktop = document.getElementById('theme-toggle-desktop');
-        if(btnDesktop){
-          btnDesktop.addEventListener('click', () => {
-            const isDark = root.classList.toggle('dark-theme');
-            localStorage.setItem(KEY, isDark ? 'dark' : 'light');
-          });
-          btnDesktop.addEventListener('keydown', (e) => { if(e.key === 'Enter' || e.key === ' ') { e.preventDefault(); btnDesktop.click(); }});
+        // toggle helpers
+        function toggleTheme() {
+          const isDark = root.classList.toggle('dark-theme');
+          localStorage.setItem(KEY, isDark ? 'dark' : 'light');
         }
 
-        // mobile toggle
-        const btnMobile = document.getElementById('theme-toggle-mobile');
-        if(btnMobile){
-          btnMobile.addEventListener('click', () => {
-            const isDark = root.classList.toggle('dark-theme');
-            localStorage.setItem(KEY, isDark ? 'dark' : 'light');
-          });
-          btnMobile.addEventListener('keydown', (e) => { if(e.key === 'Enter' || e.key === ' ') { e.preventDefault(); btnMobile.click(); }});
-        }
-      })();
+        // attach to both toggles
+        const td = document.getElementById('theme-toggle-desktop');
+        const tm = document.getElementById('theme-toggle-mobile');
+        if(td) td.addEventListener('click', toggleTheme);
+        if(tm) tm.addEventListener('click', toggleTheme);
+        // keyboard accessibility
+        [td, tm].forEach(btn => {
+          if(!btn) return;
+          btn.addEventListener('keydown', (e) => { if(e.key === 'Enter' || e.key === ' ') { e.preventDefault(); btn.click(); }});
+        });
 
-      /* EFFORT POPUP: attach data-effort and add badge to each project card
-         - If you want to change effort values, edit effortMap below
-      */
-      (function(){
-        const effortMap = {
-          'MEAL PLANNER': 'Effort: 12 hours',
-          'YUMMY HUB': 'Effort: 8 hours',
-          'THE BIG-DAY': 'Effort: 10 hours',
-          'TRAVEL YARI': 'Effort: 15 hours',
-          'TRUST BANK': 'Effort: 18 hours',
-          'BUY BUDDY': 'Effort: 20 hours',
-          'BRAIN BUZZ': 'Effort: 6 hours',
-          'STAFF INFO': 'Effort: 14 hours',
-          'CAMPUS CLOUD': 'Effort: 22 hours',
-          'FORM TO CV': 'Effort: 16 hours'
-        };
+        // Make project-arrow show tooltip text from its parent .details-container data-effort
+        document.querySelectorAll('.details-container').forEach(card => {
+          const arrowBtn = card.querySelector('.project-arrow');
+          const tooltipEl = card.querySelector('.arrow-tooltip');
+          const effortText = card.getAttribute('data-effort') || (tooltipEl ? tooltipEl.textContent.trim() : 'Effort: —');
 
-        // find project cards (your page uses .details-container and .project-title)
-        const cards = document.querySelectorAll('.details-container');
+          // if tooltip element exists, set its text so it's synced with data-effort
+          if(tooltipEl) tooltipEl.textContent = effortText;
 
-        cards.forEach(card => {
-          const titleEl = card.querySelector('.project-title');
-          let effortText = 'Effort: —';
-          if(titleEl){
-            const key = titleEl.textContent.trim().toUpperCase();
-            if(effortMap[key]) effortText = effortMap[key];
-          }
-          // set tooltip text via data-effort attribute
-          card.setAttribute('data-effort', effortText);
-
-          // add badge if not present
-          if(!card.querySelector('.effort-badge')){
-            const badge = document.createElement('div');
-            badge.className = 'effort-badge';
-            const m = effortText.match(/(\d+\s*hours?)/i);
-            badge.textContent = m ? m[1] : '—';
-            card.appendChild(badge);
+          // insert visual arrow SVG into the button (keeps layout small)
+          if(arrowBtn && !arrowBtn.querySelector('svg')){
+            arrowBtn.innerHTML = `
+              <svg viewBox="0 0 24 24" width="16" height="16" xmlns="http://www.w3.org/2000/svg" aria-hidden>
+                <path d="M12 19V6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                <path d="M5 12l7-7 7 7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+              </svg>
+            `;
           }
 
-          // keyboard accessibility: make card focusable so focus-within shows tooltip
-          if(!card.hasAttribute('tabindex')) card.setAttribute('tabindex', '0');
+          // accessibility: focus/blur to show tooltip via CSS (already handled). make arrow keyboard-focusable
+          if(arrowBtn) {
+            arrowBtn.setAttribute('tabindex', '0');
+            arrowBtn.addEventListener('keydown', (e) => {
+              if(e.key === 'Enter' || e.key === ' ') {
+                // on keyboard activation briefly toggle visibility (so keyboard users get same popup)
+                e.preventDefault();
+                arrowBtn.classList.add('keyboard-active');
+                setTimeout(()=> arrowBtn.classList.remove('keyboard-active'), 1500);
+              }
+            });
+          }
         });
       })();
 
-      /* NOTE: If you also have a script.js file linked, keep it. This inline script is additive only. */
+      // If you have a toggleMenu function in your script.js keep it. Otherwise, simple fallback:
+      if(typeof toggleMenu !== 'function'){
+        function toggleMenu(){
+          const m = document.querySelector('#hamburger-nav .menu-links');
+          if(!m) return;
+          m.style.display = (m.style.display === 'block') ? 'none' : 'block';
+        }
+      }
     </script>
 
-    <!-- keep existing external script if present -->
+    <!-- keep your other script file if present -->
     <script src="script.js"></script>
   </body>
 </html>
