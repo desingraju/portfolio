@@ -8,240 +8,278 @@
     <link rel="stylesheet" href="style.css" />
     <link rel="stylesheet" href="mediaqueries.css" />
     <style>
-      /* --- PROJECT HOVER / 3D TILT + GLOW --- */
-      /* give parent perspective so children tilt looks 3D */
+      /* ----------------------
+         Project hover (improved)
+         ---------------------- */
       .about-containers {
-        perspective: 1200px;
-        -webkit-perspective: 1200px;
+        perspective: 1100px;
       }
-
-      /* base styles for project card interaction (only applied to project containers) */
       .details-container.color-container {
-        transition: transform 350ms cubic-bezier(.2,.9,.2,1), box-shadow 350ms,
-          filter 350ms;
+        position: relative;
+        border-radius: 14px;
+        transition: transform 380ms cubic-bezier(.2,.9,.2,1),
+          box-shadow 380ms, filter 380ms;
         transform-style: preserve-3d;
         will-change: transform;
-        border-radius: 14px;
         overflow: visible;
-        position: relative;
       }
 
-      /* subtle transform of the image so it feels layered */
+      /* image layer */
       .details-container.color-container .project-img {
-        transition: transform 350ms cubic-bezier(.2,.9,.2,1), filter 350ms;
-        transform-origin: 50% 40%;
-        border-radius: 12px;
         display: block;
+        width: 100%;
+        border-radius: 12px;
+        transition: transform 380ms cubic-bezier(.2,.9,.2,1), filter 380ms;
+        transform-origin: 50% 35%;
       }
 
-      /* hover state: card lifts, tilts and gets glow */
+      /* overlay that appears on hover */
+      .details-container.color-container::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        border-radius: 12px;
+        background: linear-gradient(180deg, rgba(8, 10, 20, 0.0), rgba(8, 8, 20, 0.06));
+        opacity: 0;
+        transition: opacity 300ms ease, transform 400ms ease;
+        pointer-events: none;
+      }
+
+      .details-container.color-container .proj-overlay {
+        position: absolute;
+        left: 12px;
+        right: 12px;
+        bottom: 12px;
+        padding: 12px;
+        border-radius: 10px;
+        background: rgba(255,255,255,0.88);
+        transform: translateY(12px);
+        opacity: 0;
+        box-shadow: 0 8px 24px rgba(6,10,20,0.08);
+        transition: transform 300ms cubic-bezier(.2,.9,.2,1), opacity 250ms ease, backdrop-filter 260ms;
+        backdrop-filter: blur(6px);
+        font-weight: 600;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      /* content inside overlay */
+      .proj-overlay .overlay-title {
+        font-size: 13px;
+        letter-spacing: 0.4px;
+      }
+      .proj-overlay .overlay-actions {
+        display: flex;
+        gap: 8px;
+      }
+      .proj-overlay .overlay-actions .project-btn {
+        padding: 6px 8px;
+        font-size: 12px;
+      }
+
+      /* hover state */
       .details-container.color-container:hover {
-        transform: translateY(-12px) rotateX(6deg) rotateZ(-0.5deg);
-        box-shadow: 0 18px 40px rgba(10, 20, 40, 0.32),
-          0 6px 18px rgba(120, 95, 255, 0.10);
+        transform: translateY(-12px) rotateX(6deg) rotateZ(-0.5deg) scale(1.01);
+        box-shadow: 0 22px 48px rgba(10, 18, 40, 0.18), 0 4px 12px rgba(100, 70, 255, 0.06);
         z-index: 30;
-        filter: saturate(1.06);
+        filter: saturate(1.04);
       }
-
-      /* hover image small parallax */
       .details-container.color-container:hover .project-img {
-        transform: translateY(-6px) scale(1.035) rotateZ(-0.5deg);
-        filter: contrast(1.03);
+        transform: translateY(-8px) scale(1.04) rotateZ(-0.3deg);
+        filter: contrast(1.04);
+      }
+      .details-container.color-container:hover::before {
+        opacity: 1;
+      }
+      .details-container.color-container:hover .proj-overlay {
+        transform: translateY(0);
+        opacity: 1;
       }
 
-      /* small bright border outline (uses an inset glow effect) */
+      /* subtle neon outline */
       .details-container.color-container::after {
         content: "";
         position: absolute;
-        left: 6px;
-        right: 6px;
-        top: 6px;
-        bottom: 6px;
-        border-radius: 12px;
+        inset: 6px;
+        border-radius: 10px;
         pointer-events: none;
-        transition: box-shadow 350ms, opacity 350ms;
+        transition: box-shadow 300ms, opacity 300ms;
         opacity: 0;
       }
-
       .details-container.color-container:hover::after {
         opacity: 1;
-        box-shadow: 0 0 30px rgba(120, 95, 255, 0.18),
-          0 0 8px rgba(120, 95, 255, 0.08) inset;
+        box-shadow: 0 0 34px rgba(120, 95, 255, 0.14), 0 0 10px rgba(120, 95, 255, 0.06) inset;
       }
 
-      /* lift project buttons a bit on hover */
+      /* buttons lift */
       .details-container.color-container .btn-container .project-btn {
-        transition: transform 230ms, box-shadow 230ms;
+        transition: transform 220ms, box-shadow 220ms;
       }
       .details-container.color-container:hover .btn-container .project-btn {
         transform: translateY(-6px);
-        box-shadow: 0 8px 22px rgba(14, 22, 40, 0.12);
+        box-shadow: 0 10px 22px rgba(10, 16, 30, 0.12);
       }
 
-      /* small subtle caption pop on hover for the project-title */
-      .details-container.color-container .project-title {
-        transition: transform 300ms, text-shadow 300ms;
-      }
-      .details-container.color-container:hover .project-title {
-        transform: translateY(-6px);
-        text-shadow: 0 6px 18px rgba(10, 20, 40, 0.12);
-      }
-
-      /* Make hover feel responsive on touch: reduce hover intensity on small screens */
+      /* responsiveness: reduce tilt on small screens */
       @media (max-width: 720px) {
         .details-container.color-container:hover {
-          transform: translateY(-6px) rotateX(0deg);
-          box-shadow: 0 10px 22px rgba(10, 20, 40, 0.16);
+          transform: translateY(-8px) rotateX(0) rotateZ(0) scale(1.005);
         }
         .details-container.color-container .project-img {
           transform: none;
         }
       }
 
-      /* --- THEME (LIGHT / DARK) TOGGLE ICON (3D look) --- */
-      #theme-toggle {
+      /* ----------------------
+         Theme toggle (switch like image)
+         ---------------------- */
+      /* container fixed on right centre */
+      .theme-switch-wrap {
         position: fixed;
         right: 18px;
         top: 50%;
         transform: translateY(-50%);
         z-index: 9999;
-        width: 64px;
-        height: 64px;
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        padding: 8px;
         border-radius: 999px;
+        background: transparent;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      /* hide native checkbox */
+      .theme-switch {
+        --w: 62px;
+        --h: 34px;
+        display: inline-grid;
+        place-items: center;
+        width: var(--w);
+        height: var(--h);
+      }
+      .theme-switch input {
+        position: absolute;
+        opacity: 0;
+        pointer-events: none;
+      }
+
+      /* the track */
+      .theme-switch .track {
+        width: var(--w);
+        height: var(--h);
+        border-radius: 999px;
+        background: linear-gradient(180deg, #e7e7ea, #dcdce6);
+        box-shadow: 0 6px 16px rgba(8, 12, 24, 0.08), inset 0 1px 0 rgba(255,255,255,0.6);
+        position: relative;
+        transition: background 260ms ease, box-shadow 260ms ease, transform 260ms;
+      }
+
+      /* knob */
+      .theme-switch .knob {
+        position: absolute;
+        top: 50%;
+        left: 6px;
+        width: 26px;
+        height: 26px;
+        transform: translateY(-50%);
+        border-radius: 50%;
+        background: radial-gradient(circle at 30% 30%, #fff, #f7f7f9);
+        box-shadow: 0 6px 16px rgba(12,18,30,0.18);
+        transition: left 260ms cubic-bezier(.2,.9,.2,1), transform 260ms, box-shadow 260ms;
         display: grid;
         place-items: center;
-        cursor: pointer;
-        background: linear-gradient(180deg, #ffffff, #f0f0ff);
-        box-shadow: 0 10px 30px rgba(15, 20, 40, 0.12),
-          0 3px 8px rgba(0, 0, 0, 0.06) inset;
-        transition: transform 220ms cubic-bezier(.2,.9,.2,1),
-          box-shadow 220ms, background 220ms;
-        -webkit-backdrop-filter: blur(6px);
-        backdrop-filter: blur(6px);
+        overflow: hidden;
       }
 
-      #theme-toggle:active {
-        transform: translateY(-50%) scale(0.98);
-      }
-
-      /* the round icon inside to show sun/moon - using CSS shapes for simple visuals */
-      .theme-icon {
-        width: 44px;
-        height: 44px;
-        border-radius: 50%;
+      /* small sun/moon inside */
+      .theme-switch .knob .knob-icon {
+        width: 14px;
+        height: 14px;
+        display: block;
         position: relative;
-        display: inline-block;
-        transition: transform 300ms, box-shadow 300ms;
-        transform-style: preserve-3d;
-        box-shadow: 0 6px 18px rgba(10, 20, 40, 0.12);
+        transition: transform 260ms, opacity 260ms;
       }
-
-      /* sun rays */
-      .theme-icon .sun {
-        position: absolute;
-        left: 50%;
-        top: 50%;
-        width: 20px;
-        height: 20px;
-        transform: translate(-50%, -50%);
+      .knob .sun {
         border-radius: 50%;
-        background: radial-gradient(circle at 35% 30%, #fff9d6, #ffd24a 55%);
-        box-shadow: 0 4px 16px rgba(255, 200, 50, 0.2),
-          0 1px 3px rgba(0, 0, 0, 0.08) inset;
-        transition: opacity 260ms, transform 260ms;
-        z-index: 3;
+        background: radial-gradient(circle at 30% 30%, #fff9d6, #ffd24a 60%);
+        box-shadow: 0 2px 6px rgba(255,180,40,0.18);
       }
-
-      /* moon (crescent) */
-      .theme-icon .moon {
+      .knob .moon {
         position: absolute;
-        left: 50%;
-        top: 50%;
-        width: 20px;
-        height: 20px;
-        transform: translate(-50%, -50%) rotate(0deg);
-        border-radius: 50%;
-        background: linear-gradient(180deg, #e9eef9, #d6def0);
-        box-shadow: 0 6px 18px rgba(10, 20, 40, 0.12);
-        transition: opacity 260ms, transform 260ms;
-        z-index: 2;
-        clip-path: circle(50% at 40% 45%);
-      }
-
-      /* small cut-out to make the crescent */
-      .theme-icon .moon::after {
-        content: "";
-        position: absolute;
+        right: -6px;
         width: 14px;
         height: 14px;
         border-radius: 50%;
-        right: -2px;
-        top: 3px;
-        background: transparent;
-        box-shadow: -6px -2px 0 4px rgba(10, 20, 40, 0.02);
-        /* uses the parent background to mask — will be overridden in dark-mode JS if needed */
-      }
-
-      /* default: show sun, hide moon */
-      body:not(.dark-mode) #theme-toggle .sun {
-        opacity: 1;
-        transform: translate(-50%, -50%) scale(1);
-      }
-      body:not(.dark-mode) #theme-toggle .moon {
+        background: linear-gradient(180deg,#e9eef9,#d6def0);
+        clip-path: circle(50% at 40% 45%);
         opacity: 0;
-        transform: translate(-50%, -50%) scale(0.8) rotate(-12deg);
+        transform: translateX(6px) scale(.9);
       }
 
-      /* dark mode: show moon, hide sun */
-      body.dark-mode #theme-toggle {
-        background: linear-gradient(180deg, #0b1220, #0f1726);
-        box-shadow: 0 18px 38px rgba(2, 6, 23, 0.6);
+      /* when checked: move knob to right and change track */
+      .theme-switch input:checked + .track {
+        background: linear-gradient(180deg,#111827,#0b1220);
+        box-shadow: 0 12px 30px rgba(4,8,18,0.6), inset 0 -2px 6px rgba(255,255,255,0.02);
       }
-      body.dark-mode #theme-toggle .sun {
+      .theme-switch input:checked + .track .knob {
+        left: calc(var(--w) - 6px - 26px);
+        transform: translateY(-50%) rotate(6deg);
+        box-shadow: 0 12px 28px rgba(2,6,23,0.48);
+      }
+      .theme-switch input:checked + .track .knob .sun {
         opacity: 0;
-        transform: translate(-50%, -50%) scale(0.7) rotate(12deg);
+        transform: translateX(-8px) scale(.8);
       }
-      body.dark-mode #theme-toggle .moon {
+      .theme-switch input:checked + .track .knob .moon {
         opacity: 1;
-        transform: translate(-50%, -50%) scale(1);
+        transform: translateX(0) scale(1);
       }
 
-      /* small 3D tilt on hover */
-      #theme-toggle:hover {
-        transform: translateY(-50%) rotate(-4deg) scale(1.02);
-        box-shadow: 0 22px 46px rgba(8, 12, 32, 0.18);
+      /* label text below the switch (visual only) */
+      .theme-label {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 2px;
+        user-select: none;
+      }
+      .theme-label .label-light,
+      .theme-label .label-dark {
+        font-size: 12px;
+        color: #222;
+        font-weight: 600;
+        letter-spacing: 0.2px;
+      }
+      .theme-label .label-dark {
+        display: none;
       }
 
-      /* ensure toggle is accessible on small screens */
+      /* invert label styles in dark mode */
+      body.dark-mode .theme-label .label-light {
+        display: none;
+      }
+      body.dark-mode .theme-label .label-dark {
+        display: block;
+        color: #dbeafe;
+      }
+
+      /* make track accessible on small screens */
       @media (max-width: 520px) {
-        #theme-toggle {
-          right: 10px;
-          width: 56px;
-          height: 56px;
-        }
+        .theme-switch-wrap { right: 10px; }
+        .theme-label .label-light, .theme-label .label-dark { font-size: 11px; }
       }
 
-      /* --- MINIMAL DARK MODE OVERRIDES (only what we need) --- */
-      /* We do not change your main layout; just apply safe contrast overrides */
+      /* small overall dark-mode tweaks (non-invasive) */
       body.dark-mode {
-        background: #061020 !important;
+        background: #051021 !important;
         color: #dbeafe !important;
       }
-
-      /* example: invert icons that are grayscale-ish (keeps rest unchanged) */
       body.dark-mode img.icon {
         filter: brightness(1.05) saturate(0.5) invert(0.02) contrast(1.05);
       }
-
-      /* ensure project card backgrounds don't become completely lost */
-      body.dark-mode .details-container.color-container {
-        background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-      }
-
-      /* links contrast */
-      body.dark-mode a {
-        color: #a7d2ff;
-      }
+      body.dark-mode a { color: #9fd1ff; }
     </style>
   </head>
   <body>
@@ -256,569 +294,77 @@
         </ul>
       </div>
     </nav>
-    <nav id="hamburger-nav">
-      <div class="logo">Desing Raju</div>
-      <div class="hamburger-menu">
-        <div class="hamburger-icon" onclick="toggleMenu()">
-          <span></span>
-          <span></span>
-          <span></span>
-        </div>
-        <div class="menu-links">
-          <li><a href="#about" onclick="toggleMenu()">About</a></li>
-          <li><a href="#experience" onclick="toggleMenu()">Experience</a></li>
-          <li><a href="#projects" onclick="toggleMenu()">Projects</a></li>
-          <li><a href="#contact" onclick="toggleMenu()">Contact</a></li>
-        </div>
-      </div>
-    </nav>
-    <section id="profile">
-      <div class="section__pic-container">
-        <img src="./assets/profile-pic.png" alt="John Doe profile picture" />
-      </div>
-      <div class="section__text">
-        <p class="section__text__p1">Hello, I'm</p>
-        <h1 class="title">Desing Raju Chavvakula</h1>
-        <p class="section__text__p2">Full Stack Python Developer</p>
-        <div class="btn-container">
-          <button
-            class="btn btn-color-2"
-            onclick="window.open('./assets/Desing_Raju_Resume.pdf')"
-          >
-            Download CV
-          </button>
-          <button class="btn btn-color-1" onclick="location.href='./#contact'">
-            Contact Info
-          </button>
-        </div>
-        <div id="socials-container">
-          <img
-            src="./assets/linkedin.png"
-            alt="My LinkedIn profile"
-            class="icon"
-            onclick="location.href='https://www.linkedin.com/in/desing-raju/'"
-          />
-          <img
-            src="./assets/github.png"
-            alt="My Github profile"
-            class="icon"
-            onclick="location.href='https://github.com/desingraju'"/>
-        </div>
-      </div>
-    </section>
-    <section id="about">
-      <p class="section__text__p1">Get To Know More</p>
-      <h1 class="title">About Me</h1>
-      <div class="section-container">
-        <div class="section__pic-container">
-          <img
-            src="./assets/about-pic.png"
-            alt="Profile picture"
-            class="about-pic"
-          />
-        </div>
-        <div class="about-details-container">
-          <div class="about-containers">
-            <div class="details-container">
-              <img
-                src="./assets/experience.png"
-                alt="Experience icon"
-                class="icon"
-              />
-              <h3>Experience</h3>
-              <p>1 year<br />Python Full Stack Development</p>
-            </div>
-            <div class="details-container">
-              <img
-                src="./assets/education.png"
-                alt="Education icon"
-                class="icon"
-              />
-              <h3>Education</h3>
-              <p>B.Tech Bachelors Degree<br />(Information Technology) </p>
-            </div>
-          </div>
-          <div class="text-container">
-            <p class="about-para">Aspiring Software Developer with strong foundational skills in Python, SQL, and full-stack web development. Enthusiastic and quick-learning developer with a solid academic background and hands-on internship experience in building end-to-end applications. Skilled in problem-solving, clean code practices, and efficient UI/UX design. Passionate about leveraging technology to create reliable and scalable solutions. A proactive team player with excellent communication skills, eager to contribute to innovative projects in a collaborative environment. Highly committed to continuous learning, professional growth, and adapting to new technologies.
-            </p>
-          </div>
-        </div>
-      </div>
-      <img
-        src="./assets/arrow.png"
-        alt="Arrow icon"
-        class="icon arrow"
-        onclick="location.href='./#experience'"
-      />
-    </section>
-    <section id="experience">
-      <p class="section__text__p1">Explore My</p>
-      <h1 class="title">Experience</h1>
-      <div class="experience-details-container">
-        <div class="about-containers">
-          <div class="details-container">
-            <h2 class="experience-sub-title">Frontend Development</h2>
-            <div class="article-container">
-              <article>
-                <img
-                  src="./assets/checkmark.png"
-                  alt="Experience icon"
-                  class="icon"
-                />
-                <div>
-                  <h3>HTML</h3>
-                  <p>Experienced</p>
-                </div>
-              </article>
-              <article>
-                <img
-                  src="./assets/checkmark.png"
-                  alt="Experience icon"
-                  class="icon"
-                />
-                <div>
-                  <h3>CSS</h3>
-                  <p>Experienced</p>
-                </div>
-              </article>
-              <article>
-                <img
-                  src="./assets/checkmark.png"
-                  alt="Experience icon"
-                  class="icon"
-                />
-                <div>
-                  <h3>Bootstrap Framework</h3>
-                  <p>Basic</p>
-                </div>
-              </article>
-              <article>
-                <img
-                  src="./assets/checkmark.png"
-                  alt="Experience icon"
-                  class="icon"
-                />
-                <div>
-                  <h3>Django Templates</h3>
-                  <p>Intermediate</p>
-                </div>
-              </article>
-            </div>
-          </div>
-          <div class="details-container">
-            <h2 class="experience-sub-title">Backend Development</h2>
-            <div class="article-container">
-              <article>
-                <img
-                  src="./assets/checkmark.png"
-                  alt="Experience icon"
-                  class="icon"
-                />
-                <div>
-                  <h3>MYSQL</h3>
-                  <p>Basic</p>
-                </div>
-              </article>
-              <article>
-                <img
-                  src="./assets/checkmark.png"
-                  alt="Experience icon"
-                  class="icon"
-                />
-                <div>
-                  <h3>Git</h3>
-                  <p>Intermediate</p>
-                </div>
-              </article>
-              <article>
-                <img
-                  src="./assets/checkmark.png"
-                  alt="Experience icon"
-                  class="icon"
-                />
-                <div>
-                  <h3>Django</h3>
-                  <p>Basic</p>
-                </div>
-              </article>
-              <article>
-                <img
-                  src="./assets/checkmark.png"
-                  alt="Experience icon"
-                  class="icon"
-                />
-                <div>
-                  <h3>Python</h3>
-                  <p>Intermediate</p>
-                </div>
-              </article>
-            </div>
-          </div>
-        </div>
-      </div>
-      <img
-        src="./assets/arrow.png"
-        alt="Arrow icon"
-        class="icon arrow"
-        onclick="location.href='./#projects'"
-      />
-    </section>
-    <section id="projects">
-      <p class="section__text__p1">Browse My Recent</p>
-      <h1 class="title">Projects</h1>
-      <div class="experience-details-container">
-        <div class="about-containers">
-          <div class="details-container color-container">
-            <div class="article-container">
-              <img
-                src="./assets/project-1.png"
-                alt="project-1"
-                class="project-img"
-              />
-            </div>
-            <h2 class="experience-sub-title project-title">MEAL PLANNER</h2>
-            <div class="btn-container">
-              <button
-                class="btn btn-color-2 project-btn"
-                onclick="location.href='https://desingraju.github.io/Mealplanner/'"
-              >
-                Github
-              </button>
-              <button
-                class="btn btn-color-2 project-btn"
-                onclick="location.href='https://github.com/'"
-              >
-                Live Demo
-              </button>
-            </div>
-          </div>
-          <div class="details-container color-container">
-            <div class="article-container">
-              <img
-                src="./assets/project-2.png"
-                alt="project-2"
-                class="project-img"
-              />
-            </div>
-            <h2 class="experience-sub-title project-title">YUMMY HUB</h2>
-            <div class="btn-container">
-              <button
-                class="btn btn-color-2 project-btn"
-                onclick="location.href='https://desingraju.github.io/Foodie_'"
-              >
-                Github
-              </button>
-              <button
-                class="btn btn-color-2 project-btn"
-                onclick="location.href='https://github.com/'"
-              >
-                Live Demo
-              </button>
-            </div>
-          </div>
-          <div class="details-container color-container">
-            <div class="article-container">
-              <img
-                src="./assets/project-4.png"
-                alt="project-4"
-                class="project-img"
-              />
-            </div>
-            <h2 class="experience-sub-title project-title">THE BIG-DAY</h2>
-            <div class="btn-container">
-              <button
-                class="btn btn-color-2 project-btn"
-                onclick="location.href='https://desingraju.github.io/TimerforEvent/'"
-              >
-                Github
-              </button>
-              <button
-                class="btn btn-color-2 project-btn"
-                onclick="location.href='https://github.com/'"
-              >
-                Live Demo
-              </button>
-            </div>
-          </div>
-          <div class="details-container color-container">
-            <div class="article-container">
-              <img
-                src="./assets/project-7.png"
-                alt="project-5"
-                class="project-img"
-              />
-            </div>
-            <h2 class="experience-sub-title project-title">TRAVEL YARI</h2>
-            <div class="btn-container">
-              <button
-                class="btn btn-color-2 project-btn"
-                onclick="location.href='https://desingraju.github.io/Travelyari/'"
-              >
-                Github
-              </button>
-              <button
-                class="btn btn-color-2 project-btn"
-                onclick="location.href='https://github.com/'"
-              >
-                Live Demo
-              </button>
-            </div>
-          </div>
-          <div class="details-container color-container">
-            <div class="article-container">
-              <img
-                src="./assets/project-3.png"
-                alt="project-2"
-                class="project-img"
-              />
-            </div>
-            <h2 class="experience-sub-title project-title">TRUST BANK</h2>
-            <div class="btn-container">
-              <button
-                class="btn btn-color-2 project-btn"
-                onclick="location.href='https://replit.com/@desingrajuchavv/Bank-Application?v=1'"
-              >
-                Github
-              </button>
-              <button
-                class="btn btn-color-2 project-btn"
-                onclick="location.href='https://github.com/'"
-              >
-                Live Demo
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-      <img
-        src="./assets/arrow.png"
-        alt="Arrow icon"
-        class="icon arrow"
-        onclick="location.href='./#contact'"
-      />
-    </section>
-    <section>
-      <p class="section__text__p1"></p>
-      <h1 class="title"> </h1>
-      <div class="experience-details-container">
-        <div class="about-containers">
-          <div class="details-container color-container">
-            <div class="article-container">
-              <img
-                src="./assets/project-5.png"
-                alt="project-4"
-                class="project-img"
-              />
-            </div>
-            <h2 class="experience-sub-title project-title">BUY BUDDY</h2>
-            <div class="btn-container">
-              <button
-                class="btn btn-color-2 project-btn"
-                onclick="location.href='https://replit.com/@desingrajuchavv/E-Commerce-Application?v=1'"
-              >
-                Github
-              </button>
-              <button
-                class="btn btn-color-2 project-btn"
-                onclick="location.href='https://github.com/'"
-              >
-                Live Demo
-              </button>
-            </div>
-          </div>
-          <div class="details-container color-container">
-            <div class="article-container">
-              <img
-                src="./assets/project-6.png"
-                alt="project-6"
-                class="project-img"
-              />
-            </div>
-            <h2 class="experience-sub-title project-title">BRAIN BUZZ</h2>
-            <div class="btn-container">
-              <button
-                class="btn btn-color-2 project-btn"
-                onclick="location.href='https://replit.com/@desingrajuchavv/Quiz-App?v=1'"
-              >
-                Github
-              </button>
-              <button
-                class="btn btn-color-2 project-btn"
-                onclick="location.href='https://github.com/'"
-              >
-                Live Demo
-              </button>
-            </div>
-          </div>
-          <div class="details-container color-container">
-            <div class="article-container">
-              <img
-                src="./assets/project-8.png"
-                alt="project-2"
-                class="project-img"
-              />
-            </div>
-            <h2 class="experience-sub-title project-title">STAFF INFO</h2>
-            <div class="btn-container">
-              <button
-                class="btn btn-color-2 project-btn"
-                onclick="location.href='https://edms1.pythonanywhere.com/'"
-              >
-                Github
-              </button>
-              <button
-                class="btn btn-color-2 project-btn"
-                onclick="location.href='https://github.com/'"
-              >
-                Live Demo
-              </button>
-            </div>
-          </div>
-          <div class="details-container color-container">
-            <div class="article-container">
-              <img
-                src="./assets/project-10.png"
-                alt="project-2"
-                class="project-img"
-              />
-            </div>
-            <h2 class="experience-sub-title project-title">CAMPUS CLOUD</h2>
-            <div class="btn-container">
-              <button
-                class="btn btn-color-2 project-btn"
-                onclick="location.href='https://raju.pythonanywhere.com/'"
-              >
-                Github
-              </button>
-              <button
-                class="btn btn-color-2 project-btn"
-                onclick="location.href='https://github.com/'"
-              >
-                Live Demo
-              </button>
-            </div>
-          </div>
-          <div class="details-container color-container">
-            <div class="article-container">
-              <img
-                src="./assets/project-9.png"
-                alt="project-2"
-                class="project-img"
-              />
-            </div>
-            <h2 class="experience-sub-title project-title">FORM TO CV</h2>
-            <div class="btn-container">
-              <button
-                class="btn btn-color-2 project-btn"
-                onclick="location.href='https://sendresume.pythonanywhere.com/'"
-              >
-                Github
-              </button>
-              <button
-                class="btn btn-color-2 project-btn"
-                onclick="location.href='https://github.com/'"
-              >
-                Live Demo
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-      <img
-        src="./assets/arrow.png"
-        alt="Arrow icon"
-        class="icon arrow"
-        onclick="location.href='./#contact'"
-      />
-    </section>
-    <section id="contact">
-      <p class="section__text__p1">Get in Touch</p>
-      <h1 class="title">Contact Me</h1>
-      <div class="contact-info-upper-container">
-        <div class="contact-info-container">
-          <img
-            src="./assets/email.png"
-            alt="Email icon"
-            class="icon contact-icon email-icon"
-          />
-          <p><a href="mailto:desingrajuchavvakula@gmail.com">desingrajuchavvakula@gmail.com</a></p>
-        </div>
-        <div class="contact-info-container">
-          <img
-            src="./assets/linkedin.png"
-            alt="LinkedIn icon"
-            class="icon contact-icon"
-          />
-          <p><a href="https://www.linkedin.com/in/desing-raju/">LinkedIn</a></p>
-        </div>
-      </div>
-    </section>
-    <footer>
-      <nav>
-        <div class="nav-links-container">
-          <ul class="nav-links">
-            <li><a href="#about">About</a></li>
-            <li><a href="#experience">Experience</a></li>
-            <li><a href="#projects">Projects</a></li>
-            <li><a href="#contact">Contact</a></li>
-          </ul>
-        </div>
-      </nav>
-      <p>Copyright &#169; 2025 Desing Raju. All Rights Reserved.</p>
-    </footer>
 
-    <!-- ===== THEME TOGGLE (LIGHT / DARK) - fixed right side ===== -->
-    <div id="theme-toggle" role="button" aria-label="Toggle light or dark mode" title="Toggle theme">
-      <span class="theme-icon" id="theme-icon">
-        <span class="sun" aria-hidden="true"></span>
-        <span class="moon" aria-hidden="true"></span>
-      </span>
+    <!-- ... keep your existing page content exactly as-is ... -->
+    <!-- (I omitted repeating the entire page here for brevity in this block) -->
+    <!-- But in your actual file keep the rest of your original HTML (profile, about, projects, etc.) exactly the same. -->
+
+    <!-- IMPORTANT: below place this toggle *once* near the end of body (before scripts) -->
+    <div class="theme-switch-wrap" aria-hidden="false">
+      <label class="theme-switch" aria-label="Toggle dark mode">
+        <input id="theme-checkbox" type="checkbox" aria-checked="false" />
+        <div class="track" role="presentation">
+          <div class="knob" aria-hidden="true">
+            <span class="knob-icon">
+              <span class="sun" aria-hidden="true"></span>
+              <span class="moon" aria-hidden="true"></span>
+            </span>
+          </div>
+        </div>
+      </label>
+
+      <div class="theme-label" aria-hidden="true">
+        <span class="label-light">Light</span>
+        <span class="label-dark">Dark</span>
+      </div>
     </div>
 
+    <!-- your existing scripts -->
     <script src="script.js"></script>
+
+    <!-- THEME SWITCH SCRIPT (non-invasive) -->
     <script>
-      /* THEME TOGGLE: simple, non-invasive */
       (function () {
+        const checkbox = document.getElementById("theme-checkbox");
         const body = document.body;
-        const toggle = document.getElementById("theme-toggle");
 
-        function applyTheme(isDark) {
-          if (isDark) {
-            body.classList.add("dark-mode");
-          } else {
-            body.classList.remove("dark-mode");
+        // apply theme from saved pref (localStorage)
+        const saved = (function () {
+          try {
+            return localStorage.getItem("desing_theme_dark");
+          } catch (e) {
+            return null;
           }
+        })();
+
+        if (saved !== null) {
+          const isDark = saved === "true";
+          body.classList.toggle("dark-mode", isDark);
+          checkbox.checked = !!isDark;
+        } else {
+          // optional: follow system preference initially
+          const prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+          body.classList.toggle("dark-mode", prefersDark);
+          checkbox.checked = !!prefersDark;
         }
 
-        // initialize from localStorage
-        try {
-          const saved = localStorage.getItem("desing_theme_dark");
-          if (saved !== null) {
-            applyTheme(saved === "true");
-          } else {
-            // optional: detect user preference, but do not change other styles
-            const prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
-            applyTheme(prefersDark);
-          }
-        } catch (e) {
-          // localStorage may be blocked — ignore
-        }
-
-        toggle.addEventListener("click", function (e) {
-          e.preventDefault();
-          const isDark = body.classList.toggle("dark-mode");
+        // toggle handler
+        checkbox.addEventListener("change", function () {
+          const isDark = checkbox.checked;
+          body.classList.toggle("dark-mode", isDark);
           try {
             localStorage.setItem("desing_theme_dark", isDark ? "true" : "false");
-          } catch (err) {
+          } catch (e) {
             // ignore
           }
         });
 
-        // keyboard accessible toggle
-        toggle.addEventListener("keydown", function (e) {
-          if (e.key === "Enter" || e.key === " ") {
+        // keyboard accessibility: space toggles
+        checkbox.addEventListener("keydown", (e) => {
+          if (e.key === " " || e.key === "Enter") {
             e.preventDefault();
-            toggle.click();
+            checkbox.checked = !checkbox.checked;
+            checkbox.dispatchEvent(new Event("change"));
           }
         });
       })();
