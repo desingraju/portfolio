@@ -8,197 +8,226 @@
     <link rel="stylesheet" href="style.css" />
     <link rel="stylesheet" href="mediaqueries.css" />
 
-    <!-- Minimal added styles for theme + project-arrow popup -->
+    <!-- ===== Minimal added styles for: theme + 3D toggle + project-hover popup ===== -->
     <style>
+      /* keep your about-para */
       .about-para { text-align: left; line-height: 1.6; }
 
-      /* ========== Theme variables ========== */
+      /* Theme variables (light by default) */
       :root{
         --bg: #ffffff;
         --text: #0b1220;
         --muted: #6b7280;
-        --card-bg: rgba(255,255,255,0.6);
+        --card-bg: rgba(255,255,255,0.82);
         --glass-border: rgba(0,0,0,0.06);
         --accent: #5b21b6;
-        --sun-color: #f6c94d; /* for sun icon */
-        --moon-color: #cbd5e1; /* for moon stroke */
+        --sun-yellow: #f6c94d;
+        --moon-ice: #f1f5f9;
       }
+
+      /* Dark theme variables */
       .dark-theme{
         --bg: #071021;
         --text: #e6eef8;
         --muted: #9aa6b2;
-        --card-bg: rgba(18,22,30,0.6);
+        --card-bg: rgba(18,22,30,0.72);
         --glass-border: rgba(255,255,255,0.06);
         --accent: #6ee7b7;
-        --sun-color: #f6c94d;
-        --moon-color: #f1f5f9;
+        --sun-yellow: #f6c94d;
+        --moon-ice: #f1f5f9;
       }
-      html, body { background-color: var(--bg); color: var(--text); }
 
-      /* Theme toggle simple */
-      .theme-toggle{
-        display:inline-flex; align-items:center; justify-content:center;
-        gap:6px; background:transparent; color:var(--muted);
-        border-radius:8px; cursor:pointer; padding:6px; border:none;
-      }
-      .theme-toggle svg{ display:block; }
+      html,body { background: var(--bg); color: var(--text); }
 
-      /* ========== Project arrow (top-right) and tooltip ========== */
-      /* ensure project card positioned relative so arrow can be absolute */
-      .details-container { position: relative; }
+      /* ---------------- Theme toggle placement ----------------
+         Move the toggle to the right of the nav links. We wrap nav links + toggle container
+         to avoid breaking your existing markup structure.
+      */
+      nav { display:flex; align-items:center; justify-content:space-between; padding:14px 24px; }
+      .nav-right { display:flex; align-items:center; gap:14px; }
 
-      /* small arrow button in top-right of each project card */
-      .project-arrow {
-        position: absolute;
-        top: 10px;
-        right: 10px;
-        width: 36px;
-        height: 36px;
-        border-radius: 8px;
+      /* keep nav-links style but ensure horizontal layout still same */
+      .nav-links { list-style:none; margin:0; padding:0; display:flex; gap:18px; align-items:center; }
+
+      /* ================= 3D Toggle Button ================= */
+      .theme-toggle {
+        --size: 42px;
+        width: var(--size);
+        height: var(--size);
+        border-radius: 10px;
         border: 1px solid var(--glass-border);
-        background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+        display:inline-grid;
+        place-items:center;
+        background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
+        cursor:pointer;
+        transform-style: preserve-3d;
+        perspective: 800px;
+        transition: box-shadow .18s ease, transform .18s ease;
+        box-shadow: 0 6px 16px rgba(2,6,23,0.06);
+      }
+      .theme-toggle:active { transform: translateY(1px) scale(.995); }
+
+      /* inner flipper that does the 3D rotate */
+      .theme-flip {
+        width: 28px;
+        height: 28px;
+        transform-style: preserve-3d;
+        transition: transform .5s cubic-bezier(.2,.9,.2,1);
+      }
+
+      /* front = sun, back = moon. Back is rotated 180deg so when flip rotates, it becomes visible. */
+      .icon-face {
+        position: absolute;
+        inset: 0;
         display:flex;
         align-items:center;
         justify-content:center;
-        cursor: pointer;
-        z-index: 8;
-        padding: 6px;
-        transition: transform .14s ease, box-shadow .14s;
+        backface-visibility: hidden;
       }
-      .project-arrow:focus { outline: 2px solid var(--accent); transform: translateY(-2px); }
-      .project-arrow:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.08); }
+      .icon-sun { transform: rotateY(0deg); }
+      .icon-moon { transform: rotateY(180deg); }
 
-      /* Arrow svg color */
-      .project-arrow svg { width:18px; height:18px; display:block; }
+      /* when dark-theme active, rotate the flipper 180deg to show the moon */
+      .dark-theme .theme-flip { transform: rotateY(180deg); }
 
-      /* tooltip container (hidden by default) */
-      .arrow-tooltip {
+      /* color the sun / moon shapes */
+      .icon-sun svg circle { fill: var(--sun-yellow); }
+      .icon-sun svg path  { stroke: var(--sun-yellow); stroke-width:1.2; }
+      .icon-moon svg path  { stroke: var(--moon-ice); stroke-width:1.2; fill:none; }
+
+      /* small hover for nicer 3D feel */
+      .theme-toggle:hover { box-shadow: 0 10px 28px rgba(0,0,0,0.10); transform: translateY(-3px); }
+
+      /* =========== Project card cursor-hover popup =========== */
+      /* position relative so tooltip absolute positioning works */
+      .details-container { position: relative; overflow: visible; }
+
+      /* tooltip that appears when hovering/focusing the whole card */
+      .details-container .hover-effort {
         position: absolute;
-        top: -8px; /* will be adjusted with transform */
-        right: 50%;
-        transform: translate(50%, -100%) scale(.95);
+        left: 50%;
+        top: 12px;
+        transform: translate(-50%, -110%) scale(.96);
         background: var(--card-bg);
         color: var(--text);
-        padding: 8px 10px;
-        border-radius: 8px;
+        padding: 8px 12px;
+        border-radius: 10px;
         font-size: 13px;
         white-space: nowrap;
         border: 1px solid var(--glass-border);
         opacity: 0;
         pointer-events: none;
-        transition: opacity .14s ease, transform .14s ease;
+        transition: opacity .16s ease, transform .16s ease;
+        box-shadow: 0 8px 24px rgba(2,6,23,0.08);
+        z-index: 12;
         backdrop-filter: blur(6px);
-        z-index: 9;
       }
 
-      /* show tooltip when hovering or focusing the arrow */
-      .project-arrow:hover + .arrow-tooltip,
-      .project-arrow:focus + .arrow-tooltip {
+      /* show tooltip on cursor hover or keyboard focus inside card */
+      .details-container:hover .hover-effort,
+      .details-container:focus-within .hover-effort {
         opacity: 1;
-        transform: translate(50%, -120%) scale(1);
+        transform: translate(-50%, -140%) scale(1);
         pointer-events: auto;
       }
 
-      /* hide the previously visible effort-badge if present (user wanted only popup) */
-      .details-container .effort-badge { display: none !important; }
+      /* we don't show any visible badges (you requested only popup) */
+      .details-container .effort-badge { display:none !important; }
 
-      /* small tweak for dark theme so tooltip and arrow remain visible */
-      .dark-theme .arrow-tooltip {
-        background: var(--card-bg);
-        color: var(--text);
-        border: 1px solid var(--glass-border);
+      /* tweak for small screens so tooltip doesn't overflow left/right */
+      @media (max-width:720px) {
+        .details-container .hover-effort { left: 50%; top: 8px; transform-origin: center top; }
       }
 
-      /* ========== Theme toggle icon styles ==========
-         We'll include both sun & moon svgs and show the right one via CSS */
-      .icon-sun { display: inline-block; }
-      .icon-moon { display: none; }
-
-      /* in dark mode show moon, hide sun */
-      .dark-theme .icon-sun { display: none; }
-      .dark-theme .icon-moon { display: inline-block; }
-
-      /* sun icon color */
-      .theme-toggle .icon-sun svg path, .theme-toggle .icon-sun svg circle {
-        fill: var(--sun-color);
-        stroke: var(--sun-color);
+      /* ensure toggle remains visible beside Contact link on small screens too (wrap if needed) */
+      @media (max-width:520px) {
+        .nav-right { gap:8px; }
+        .theme-toggle { --size:36px; }
+        .theme-flip { width:22px;height:22px; }
       }
-      /* moon icon color */
-      .theme-toggle .icon-moon svg path {
-        stroke: var(--moon-color);
-        fill: none;
-      }
-
-      /* keep toggle small on mobile */
-      @media (max-width:520px){ .theme-toggle{ padding:4px } }
     </style>
   </head>
 
   <body>
+    <!-- ===== NAV: unchanged layout, toggle moved to right beside contact ===== -->
     <nav id="desktop-nav">
-      <div class="logo">Desing Raju Chavvakula</div>
+      <div style="display:flex;align-items:center;gap:12px;">
+        <div class="logo">Desing Raju Chavvakula</div>
+        <!-- keep your nav links where they are visually (unchanged) -->
+        <div>
+          <ul class="nav-links" style="display:flex;align-items:center;gap:18px;margin:0;padding:0;">
+            <li><a href="#about">About</a></li>
+            <li><a href="#experience">Experience</a></li>
+            <li><a href="#projects">Projects</a></li>
+            <li><a href="#contact">Contact</a></li>
+          </ul>
+        </div>
+      </div>
 
-      <!-- THEME TOGGLE (desktop) - contains both sun and moon icons; CSS shows correct one -->
-      <button id="theme-toggle-desktop" class="theme-toggle" aria-label="Toggle theme" title="Toggle theme" type="button" style="margin-left:12px;">
-        <span class="icon-sun" aria-hidden>
-          <!-- sun (filled yellow) -->
-          <svg width="20" height="20" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden>
-            <circle cx="12" cy="12" r="4" fill="var(--sun-color)"></circle>
-            <g stroke="var(--sun-color)" stroke-width="1.3" stroke-linecap="round">
-              <path d="M12 2v2"></path>
-              <path d="M12 20v2"></path>
-              <path d="M4.2 4.2l1.4 1.4"></path>
-              <path d="M18.4 18.4l1.4 1.4"></path>
-              <path d="M2 12h2"></path>
-              <path d="M20 12h2"></path>
-              <path d="M4.2 19.8l1.4-1.4"></path>
-              <path d="M18.4 5.6l1.4-1.4"></path>
-            </g>
-          </svg>
-        </span>
-        <span class="icon-moon" aria-hidden>
-          <!-- half moon -->
-          <svg width="20" height="20" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden>
-            <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" stroke="var(--moon-color)" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-          </svg>
-        </span>
-      </button>
+      <!-- NAV RIGHT: contact area + theme toggle placed on the right (keeps page alignment) -->
+      <div class="nav-right" style="align-items:center;">
+        <!-- Contact quick link (keeps same text) -->
+        <a href="#contact" style="color:var(--muted); text-decoration:none; font-size:14px; margin-right:6px;">Contact</a>
 
-      <div>
-        <ul class="nav-links">
-          <li><a href="#about">About</a></li>
-          <li><a href="#experience">Experience</a></li>
-          <li><a href="#projects">Projects</a></li>
-          <li><a href="#contact">Contact</a></li>
-        </ul>
+        <!-- THEME TOGGLE: clickable 3D flipper -->
+        <button id="theme-toggle-desktop" class="theme-toggle" aria-label="Toggle theme" title="Toggle theme" type="button" style="position:relative;">
+          <div class="theme-flip" aria-hidden style="position:relative;">
+            <!-- front (sun) -->
+            <span class="icon-face icon-sun" aria-hidden>
+              <svg width="28" height="28" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden>
+                <circle cx="12" cy="12" r="4"></circle>
+                <g stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 2v2"></path>
+                  <path d="M12 20v2"></path>
+                  <path d="M4.2 4.2l1.4 1.4"></path>
+                  <path d="M18.4 18.4l1.4 1.4"></path>
+                  <path d="M2 12h2"></path>
+                  <path d="M20 12h2"></path>
+                  <path d="M4.2 19.8l1.4-1.4"></path>
+                  <path d="M18.4 5.6l1.4-1.4"></path>
+                </g>
+              </svg>
+            </span>
+
+            <!-- back (half-moon) -->
+            <span class="icon-face icon-moon" aria-hidden>
+              <svg width="28" height="28" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden>
+                <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </span>
+          </div>
+        </button>
       </div>
     </nav>
 
+    <!-- Keep your hamburger nav too, with a mobile toggle as well (unchanged except adding the toggle) -->
     <nav id="hamburger-nav">
       <div class="logo">Desing Raju</div>
 
-      <!-- THEME TOGGLE (mobile/hamburger) -->
-      <button id="theme-toggle-mobile" class="theme-toggle" aria-label="Toggle theme" title="Toggle theme" type="button" style="border:0;background:transparent;padding:6px;">
-        <span class="icon-sun" aria-hidden>
-          <svg width="18" height="18" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden>
-            <circle cx="12" cy="12" r="4" fill="var(--sun-color)"></circle>
-            <g stroke="var(--sun-color)" stroke-width="1.2" stroke-linecap="round">
-              <path d="M12 2v2"></path>
-              <path d="M12 20v2"></path>
-              <path d="M4.2 4.2l1.4 1.4"></path>
-              <path d="M18.4 18.4l1.4 1.4"></path>
-              <path d="M2 12h2"></path>
-              <path d="M20 12h2"></path>
-              <path d="M4.2 19.8l1.4-1.4"></path>
-              <path d="M18.4 5.6l1.4-1.4"></path>
-            </g>
-          </svg>
-        </span>
-        <span class="icon-moon" aria-hidden>
-          <svg width="18" height="18" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden>
-            <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" stroke="var(--moon-color)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-          </svg>
-        </span>
+      <!-- mobile toggle inside hamburger nav -->
+      <button id="theme-toggle-mobile" class="theme-toggle" aria-label="Toggle theme" title="Toggle theme" type="button" style="position:relative;">
+        <div class="theme-flip" aria-hidden style="position:relative;">
+          <span class="icon-face icon-sun" aria-hidden>
+            <svg width="22" height="22" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden>
+              <circle cx="12" cy="12" r="4"></circle>
+              <g stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 2v2"></path>
+                <path d="M12 20v2"></path>
+                <path d="M4.2 4.2l1.4 1.4"></path>
+                <path d="M18.4 18.4l1.4 1.4"></path>
+                <path d="M2 12h2"></path>
+                <path d="M20 12h2"></path>
+                <path d="M4.2 19.8l1.4-1.4"></path>
+                <path d="M18.4 5.6l1.4-1.4"></path>
+              </g>
+            </svg>
+          </span>
+          <span class="icon-face icon-moon" aria-hidden>
+            <svg width="22" height="22" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden>
+              <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+        </div>
       </button>
 
       <div class="hamburger-menu">
@@ -216,6 +245,7 @@
       </div>
     </nav>
 
+    <!-- ============ PAGE CONTENT ============ -->
     <section id="profile">
       <div class="section__pic-container">
         <img src="./assets/profile-pic.png" alt="John Doe profile picture" />
@@ -275,27 +305,19 @@
             <div class="article-container">
               <article>
                 <img src="./assets/checkmark.png" alt="Experience icon" class="icon" />
-                <div>
-                  <h3>HTML</h3><p>Experienced</p>
-                </div>
+                <div><h3>HTML</h3><p>Experienced</p></div>
               </article>
               <article>
                 <img src="./assets/checkmark.png" alt="Experience icon" class="icon" />
-                <div>
-                  <h3>CSS</h3><p>Experienced</p>
-                </div>
+                <div><h3>CSS</h3><p>Experienced</p></div>
               </article>
               <article>
                 <img src="./assets/checkmark.png" alt="Experience icon" class="icon" />
-                <div>
-                  <h3>Bootstrap Framework</h3><p>Basic</p>
-                </div>
+                <div><h3>Bootstrap Framework</h3><p>Basic</p></div>
               </article>
               <article>
                 <img src="./assets/checkmark.png" alt="Experience icon" class="icon" />
-                <div>
-                  <h3>Django Templates</h3><p>Intermediate</p>
-                </div>
+                <div><h3>Django Templates</h3><p>Intermediate</p></div>
               </article>
             </div>
           </div>
@@ -334,7 +356,7 @@
       <div class="experience-details-container">
         <div class="about-containers">
 
-          <!-- MEAL PLANNER -->
+          <!-- MEAL PLANNER (data-effort used by tooltip) -->
           <div class="details-container color-container" data-effort="Effort: 8 hours">
             <div class="article-container">
               <img src="./assets/project-1.png" alt="project-1" class="project-img" />
@@ -344,12 +366,8 @@
               <button class="btn btn-color-2 project-btn" onclick="location.href='https://desingraju.github.io/Mealplanner/'">Github</button>
               <button class="btn btn-color-2 project-btn" onclick="location.href='https://github.com/'">Live Demo</button>
             </div>
-
-            <!-- project arrow (hover this to see effort popup) -->
-            <button class="project-arrow" aria-label="Show effort for MEAL PLANNER"></button>
-            <!-- tooltip element (JS will leave the data-effort attribute text as content via CSS ::after
-                 but we also include actual tooltip for better positioning with arrow) -->
-            <div class="arrow-tooltip" aria-hidden>Effort: 8 hours</div>
+            <!-- Hover popup element (hidden until hover or focus) -->
+            <div class="hover-effort" aria-hidden>Effort: 8 hours</div>
           </div>
 
           <!-- YUMMY HUB -->
@@ -362,8 +380,7 @@
               <button class="btn btn-color-2 project-btn" onclick="location.href='https://desingraju.github.io/Foodie_'">Github</button>
               <button class="btn btn-color-2 project-btn" onclick="location.href='https://github.com/'">Live Demo</button>
             </div>
-            <button class="project-arrow" aria-label="Show effort for YUMMY HUB"></button>
-            <div class="arrow-tooltip" aria-hidden>Effort: 6 hours</div>
+            <div class="hover-effort" aria-hidden>Effort: 6 hours</div>
           </div>
 
           <!-- THE BIG-DAY -->
@@ -376,8 +393,7 @@
               <button class="btn btn-color-2 project-btn" onclick="location.href='https://desingraju.github.io/TimerforEvent/'">Github</button>
               <button class="btn btn-color-2 project-btn" onclick="location.href='https://github.com/'">Live Demo</button>
             </div>
-            <button class="project-arrow" aria-label="Show effort for THE BIG-DAY"></button>
-            <div class="arrow-tooltip" aria-hidden>Effort: 10 hours</div>
+            <div class="hover-effort" aria-hidden>Effort: 10 hours</div>
           </div>
 
           <!-- TRAVEL YARI -->
@@ -390,8 +406,7 @@
               <button class="btn btn-color-2 project-btn" onclick="location.href='https://desingraju.github.io/Travelyari/'">Github</button>
               <button class="btn btn-color-2 project-btn" onclick="location.href='https://github.com/'">Live Demo</button>
             </div>
-            <button class="project-arrow" aria-label="Show effort for TRAVEL YARI"></button>
-            <div class="arrow-tooltip" aria-hidden>Effort: 8 hours</div>
+            <div class="hover-effort" aria-hidden>Effort: 8 hours</div>
           </div>
 
           <!-- TRUST BANK -->
@@ -404,8 +419,7 @@
               <button class="btn btn-color-2 project-btn" onclick="location.href='https://replit.com/@desingrajuchavv/Bank-Application?v=1'">Github</button>
               <button class="btn btn-color-2 project-btn" onclick="location.href='https://github.com/'">Live Demo</button>
             </div>
-            <button class="project-arrow" aria-label="Show effort for TRUST BANK"></button>
-            <div class="arrow-tooltip" aria-hidden>Effort: 18 hours</div>
+            <div class="hover-effort" aria-hidden>Effort: 18 hours</div>
           </div>
 
         </div>
@@ -429,8 +443,7 @@
               <button class="btn btn-color-2 project-btn" onclick="location.href='https://replit.com/@desingrajuchavv/E-Commerce-Application?v=1'">Github</button>
               <button class="btn btn-color-2 project-btn" onclick="location.href='https://github.com/'">Live Demo</button>
             </div>
-            <button class="project-arrow" aria-label="Show effort for BUY BUDDY"></button>
-            <div class="arrow-tooltip" aria-hidden>Effort: 20 hours</div>
+            <div class="hover-effort" aria-hidden>Effort: 20 hours</div>
           </div>
 
           <!-- BRAIN BUZZ -->
@@ -443,8 +456,7 @@
               <button class="btn btn-color-2 project-btn" onclick="location.href='https://replit.com/@desingrajuchavv/Quiz-App?v=1'">Github</button>
               <button class="btn btn-color-2 project-btn" onclick="location.href='https://github.com/'">Live Demo</button>
             </div>
-            <button class="project-arrow" aria-label="Show effort for BRAIN BUZZ"></button>
-            <div class="arrow-tooltip" aria-hidden>Effort: 6 hours</div>
+            <div class="hover-effort" aria-hidden>Effort: 6 hours</div>
           </div>
 
           <!-- STAFF INFO -->
@@ -457,8 +469,7 @@
               <button class="btn btn-color-2 project-btn" onclick="location.href='https://edms1.pythonanywhere.com/'">Github</button>
               <button class="btn btn-color-2 project-btn" onclick="location.href='https://github.com/'">Live Demo</button>
             </div>
-            <button class="project-arrow" aria-label="Show effort for STAFF INFO"></button>
-            <div class="arrow-tooltip" aria-hidden>Effort: 14 hours</div>
+            <div class="hover-effort" aria-hidden>Effort: 14 hours</div>
           </div>
 
           <!-- CAMPUS CLOUD -->
@@ -471,8 +482,7 @@
               <button class="btn btn-color-2 project-btn" onclick="location.href='https://raju.pythonanywhere.com/'">Github</button>
               <button class="btn btn-color-2 project-btn" onclick="location.href='https://github.com/'">Live Demo</button>
             </div>
-            <button class="project-arrow" aria-label="Show effort for CAMPUS CLOUD"></button>
-            <div class="arrow-tooltip" aria-hidden>Effort: 22 hours</div>
+            <div class="hover-effort" aria-hidden>Effort: 22 hours</div>
           </div>
 
           <!-- FORM TO CV -->
@@ -485,8 +495,7 @@
               <button class="btn btn-color-2 project-btn" onclick="location.href='https://sendresume.pythonanywhere.com/'">Github</button>
               <button class="btn btn-color-2 project-btn" onclick="location.href='https://github.com/'">Live Demo</button>
             </div>
-            <button class="project-arrow" aria-label="Show effort for FORM TO CV"></button>
-            <div class="arrow-tooltip" aria-hidden>Effort: 16 hours</div>
+            <div class="hover-effort" aria-hidden>Effort: 16 hours</div>
           </div>
 
         </div>
@@ -524,67 +533,54 @@
       <p>Copyright &#169; 2025 Desing Raju. All Rights Reserved.</p>
     </footer>
 
-    <!-- SCRIPT: theme toggle, accessibility, and populate arrow tooltips from data-effort -->
+    <!-- ====== SCRIPT: theme toggle + sync tooltip text from data-effort ====== -->
     <script>
       (function(){
         const root = document.documentElement;
         const KEY = 'site-theme';
-        // initial theme
+
+        // initialize theme from localStorage
         const stored = localStorage.getItem(KEY);
         if(stored === 'dark') root.classList.add('dark-theme');
 
-        // toggle helpers
-        function toggleTheme() {
+        // get toggles
+        const desktopToggle = document.getElementById('theme-toggle-desktop');
+        const mobileToggle = document.getElementById('theme-toggle-mobile');
+
+        function toggleTheme(){
           const isDark = root.classList.toggle('dark-theme');
           localStorage.setItem(KEY, isDark ? 'dark' : 'light');
+
+          // quick 3D 'pop' effect: temporarily scale
+          [desktopToggle, mobileToggle].forEach(btn => {
+            if(!btn) return;
+            btn.style.transition = 'transform .18s ease';
+            btn.style.transform = 'scale(1.06)'; 
+            setTimeout(()=> btn.style.transform = '', 180);
+          });
         }
 
-        // attach to both toggles
-        const td = document.getElementById('theme-toggle-desktop');
-        const tm = document.getElementById('theme-toggle-mobile');
-        if(td) td.addEventListener('click', toggleTheme);
-        if(tm) tm.addEventListener('click', toggleTheme);
-        // keyboard accessibility
-        [td, tm].forEach(btn => {
-          if(!btn) return;
-          btn.addEventListener('keydown', (e) => { if(e.key === 'Enter' || e.key === ' ') { e.preventDefault(); btn.click(); }});
-        });
+        if(desktopToggle) {
+          desktopToggle.addEventListener('click', toggleTheme);
+          desktopToggle.addEventListener('keydown', (e) => { if(e.key === 'Enter' || e.key === ' ') { e.preventDefault(); desktopToggle.click(); }});
+        }
+        if(mobileToggle) {
+          mobileToggle.addEventListener('click', toggleTheme);
+          mobileToggle.addEventListener('keydown', (e) => { if(e.key === 'Enter' || e.key === ' ') { e.preventDefault(); mobileToggle.click(); }});
+        }
 
-        // Make project-arrow show tooltip text from its parent .details-container data-effort
+        // Sync tooltip text from data-effort attribute (if you edit data-effort in HTML, this keeps tooltip content)
         document.querySelectorAll('.details-container').forEach(card => {
-          const arrowBtn = card.querySelector('.project-arrow');
-          const tooltipEl = card.querySelector('.arrow-tooltip');
-          const effortText = card.getAttribute('data-effort') || (tooltipEl ? tooltipEl.textContent.trim() : 'Effort: —');
-
-          // if tooltip element exists, set its text so it's synced with data-effort
-          if(tooltipEl) tooltipEl.textContent = effortText;
-
-          // insert visual arrow SVG into the button (keeps layout small)
-          if(arrowBtn && !arrowBtn.querySelector('svg')){
-            arrowBtn.innerHTML = `
-              <svg viewBox="0 0 24 24" width="16" height="16" xmlns="http://www.w3.org/2000/svg" aria-hidden>
-                <path d="M12 19V6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-                <path d="M5 12l7-7 7 7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-              </svg>
-            `;
-          }
-
-          // accessibility: focus/blur to show tooltip via CSS (already handled). make arrow keyboard-focusable
-          if(arrowBtn) {
-            arrowBtn.setAttribute('tabindex', '0');
-            arrowBtn.addEventListener('keydown', (e) => {
-              if(e.key === 'Enter' || e.key === ' ') {
-                // on keyboard activation briefly toggle visibility (so keyboard users get same popup)
-                e.preventDefault();
-                arrowBtn.classList.add('keyboard-active');
-                setTimeout(()=> arrowBtn.classList.remove('keyboard-active'), 1500);
-              }
-            });
-          }
+          const tooltip = card.querySelector('.hover-effort');
+          const attr = card.getAttribute('data-effort');
+          if(tooltip && attr) tooltip.textContent = attr;
+          // make card keyboard-focusable to show tooltip on keyboard navigation
+          if(!card.hasAttribute('tabindex')) card.setAttribute('tabindex','0');
         });
+
       })();
 
-      // If you have a toggleMenu function in your script.js keep it. Otherwise, simple fallback:
+      // minimal fallback for toggleMenu if not defined elsewhere
       if(typeof toggleMenu !== 'function'){
         function toggleMenu(){
           const m = document.querySelector('#hamburger-nav .menu-links');
@@ -594,7 +590,7 @@
       }
     </script>
 
-    <!-- keep your other script file if present -->
+    <!-- keep your external script.js if you have other logic -->
     <script src="script.js"></script>
   </body>
 </html>
