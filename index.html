@@ -1,474 +1,450 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Desing Raju — Portfolio</title>
-  <meta name="description" content="Desing Raju — Full Stack Python Developer. Portfolio, projects and contact." />
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Portfolio</title>
 
-  <!-- Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+    <!-- your original styles (keep if you use them) -->
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="mediaqueries.css" />
 
-  <style>
-    :root{
-      --bg:#ffffff;
-      --card:#ffffff;
-      --text:#0f172a;
-      --muted:#6b7280;
-      --accent:#2563EB;
-      --glass: rgba(255,255,255,0.6);
-      --shadow: 0 10px 30px rgba(2,6,23,0.06);
-      --radius-lg:18px;
-      --radius-md:12px;
-      --max-width:1200px;
-    }
+    <!-- ===== Theme variables & small helpers (added) ===== -->
+    <style>
+      :root {
+        /* light theme */
+        --bg: #ffffff;
+        --card: #ffffff;
+        --text: #0f172a;
+        --muted: #6b7280;
+        --accent: #2563EB;
+        --border: rgba(15,23,42,0.06);
+      }
+      html.dark {
+        /* dark theme */
+        --bg: #0b0f16;
+        --card: #0f1724;
+        --text: #e6eef8;
+        --muted: #9aa8bf;
+        --accent: #60a5fa;
+        --border: rgba(255,255,255,0.06);
+      }
 
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{
-      margin:0;
-      font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-      background:var(--bg);
-      color:var(--text);
-      line-height:1.6;
-      -webkit-font-smoothing:antialiased;
-      -moz-osx-font-smoothing:grayscale;
-    }
-    a{color:inherit;text-decoration:none}
-    img{max-width:100%;display:block}
-    .container{max-width:var(--max-width); margin:0 auto; padding:2rem 1.25rem;}
+      /* apply variables (keeps compatibility with your CSS) */
+      html, body { background: var(--bg); color: var(--text); transition: background .18s ease, color .18s ease; }
+      a { color: var(--accent); }
+      /* theme toggle button */
+      .theme-toggle {
+        display:inline-flex; align-items:center; gap:.5rem;
+        padding:.35rem .6rem; border-radius:8px; border:1px solid var(--border);
+        background:transparent; cursor:pointer; color:var(--text);
+        font-weight:600;
+      }
+      .theme-toggle:focus { outline: 3px solid rgba(37,99,235,0.18); outline-offset:3px; }
+      /* small fix for your mobile menu list */
+      .menu-links li { list-style: none; margin: 6px 0; }
+    </style>
+  </head>
 
-    /* Header */
-    header{
-      position:sticky; top:0; z-index:60;
-      backdrop-filter: blur(6px);
-      background: linear-gradient(180deg, var(--glass), transparent);
-      border-bottom:1px solid rgba(15,23,42,0.04);
-    }
-    .nav-inner{display:flex;align-items:center;justify-content:space-between; gap:1rem; padding:0.6rem 0;}
-    .brand{font-weight:700; font-family:"Poppins"; font-size:1.05rem}
-    nav.desktop a{margin-left:1rem; color:var(--muted); font-weight:500; padding:6px; border-radius:8px}
-    nav.desktop a:focus, nav.desktop a:hover{color:var(--text); background: rgba(15,23,42,0.03)}
+  <body>
+    <!-- Desktop Nav -->
+    <nav id="desktop-nav" style="display:flex; align-items:center; justify-content:space-between; padding:12px 20px;">
+      <div class="logo">Desing Raju Chavvakula</div>
 
-    /* Hamburger */
-    .hamburger{display:none}
-    .menu-links{display:none}
-    .menu-links.open{display:block; position:absolute; right:16px; top:64px; background:var(--card); padding:1rem; border-radius:10px; box-shadow:var(--shadow)}
-
-    /* Buttons */
-    .btn{
-      display:inline-flex; align-items:center; justify-content:center;
-      border-radius:999px; padding:0.55rem 0.9rem; cursor:pointer; font-weight:600; border:none;
-    }
-    .btn-ghost{background:transparent;border:1px solid rgba(15,23,42,0.06)}
-    .btn-primary{background:var(--accent); color:white; box-shadow:0 10px 26px rgba(37,99,235,0.14)}
-
-    /* Hero */
-    .hero{display:grid; grid-template-columns: 360px 1fr; gap:3rem; align-items:center; padding:3.2rem 0}
-    .portrait{width:360px; height:360px; border-radius:50%; object-fit:cover; box-shadow:var(--shadow); border:8px solid rgba(255,255,255,0.02)}
-    .hero h1{font-family:"Poppins"; font-size:3.2rem; margin:0 0 0.35rem}
-    .lead{color:var(--muted); font-size:1.15rem; margin:0 0 1rem}
-    .actions{display:flex; gap:1rem; align-items:center}
-    .socials{display:flex; gap:10px; margin-top:1rem}
-
-    /* About */
-    .section-title{font-family:"Poppins"; font-size:2rem; text-align:center; margin-bottom:1rem}
-    .about-grid{display:grid; grid-template-columns:360px 1fr; gap:2rem; align-items:start}
-    .about-photo{border-radius:18px; overflow:hidden; box-shadow:var(--shadow)}
-    .info-cards{display:flex; gap:1rem; margin-bottom:1rem; flex-wrap:wrap}
-    .info-card{flex:1 1 220px; background:var(--card); border-radius:14px; padding:1.2rem; text-align:center; box-shadow:var(--shadow)}
-    .about-para { text-align: left; line-height: 1.7; color:var(--muted); }
-
-    /* Experience */
-    .experience-wrap{display:flex; gap:1rem; justify-content:center; margin-top:1.25rem; flex-wrap:wrap}
-    .exp-card{background:var(--card); border-radius:14px; padding:1.2rem; width:360px; box-shadow:var(--shadow)}
-    .exp-card h3{margin:0 0 .6rem; font-family:"Poppins"}
-
-    /* Projects */
-    #projects .projects-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:1.6rem; align-items:stretch; margin-top:1rem}
-    .project-card{ background:var(--card); border-radius:var(--radius-lg); padding:1.1rem; box-shadow:var(--shadow); display:flex; flex-direction:column; justify-content:space-between; transition:transform .28s cubic-bezier(.2,.9,.2,1), box-shadow .28s;}
-    .project-card:hover{transform:translateY(-10px); box-shadow:0 30px 60px rgba(2,6,23,0.16)}
-    .project-thumb{height:260px; border-radius:12px; overflow:hidden; display:block; background:#f7f7f7}
-    .project-thumb img{
-      width:100%;
-      height:100%;
-      object-fit:cover;
-      /* prefer browser default scaling; if you still see blur provide higher-res images */
-      image-rendering: auto;
-      -webkit-transform: translateZ(0); /* help some browsers render crisply */
-    }
-    .project-title{font-family:"Poppins"; font-weight:700; margin-top:0.9rem; text-align:center; font-size:1.05rem}
-    .project-desc{color:var(--muted); text-align:center; margin-top:0.4rem; font-size:0.95rem}
-    .project-cta{display:flex; gap:0.75rem; justify-content:center; margin-top:1rem}
-
-    /* Contact (form removed — only links shown) */
-    .contact-links{display:flex; gap:1rem; justify-content:center; flex-wrap:wrap; margin-top:1.2rem}
-    .contact-pill{display:inline-flex; align-items:center; gap:.6rem; padding:.7rem 1rem; border-radius:999px; border:1px solid rgba(15,23,42,0.06); background:var(--card); box-shadow:var(--shadow)}
-    .contact-pill a{color:var(--accent); font-weight:600}
-
-    /* Footer */
-    footer{padding:2rem 0; text-align:center; color:var(--muted); font-size:0.95rem}
-
-    /* Toast (kept for other actions if needed) */
-    .toast{position:fixed; right:20px; bottom:22px; background:var(--card); padding:0.8rem 1rem; border-radius:10px; box-shadow:var(--shadow); display:none; z-index:999}
-
-    /* Responsive */
-    @media (max-width:1100px){
-      .projects-grid{grid-template-columns:repeat(2,1fr)}
-      .hero{grid-template-columns:1fr; text-align:center}
-      .portrait{margin:0 auto}
-      nav.desktop{display:none}
-      .hamburger{display:block}
-      .about-grid{grid-template-columns:1fr}
-      .exp-card{width:100%}
-    }
-    @media (max-width:640px){
-      .projects-grid{grid-template-columns:1fr}
-      .hero h1{font-size:2rem}
-      .lead{font-size:1rem}
-      .container{padding:1rem}
-      .project-thumb{height:220px}
-    }
-
-    /* focus */
-    a:focus,button:focus,input:focus, textarea:focus {outline: 3px solid rgba(37,99,235,0.18); outline-offset:3px; border-radius:8px}
-  </style>
-</head>
-
-<body>
-  <header>
-    <div class="container nav-inner" role="navigation" aria-label="Main navigation">
-      <div class="brand">Desing Raju Chavvakula</div>
-
-      <nav class="desktop" aria-label="Primary">
-        <a href="#about">About</a>
-        <a href="#experience">Experience</a>
-        <a href="#projects">Projects</a>
-        <a href="#contact">Contact</a>
-      </nav>
-
-      <div style="display:flex;align-items:center;gap:.6rem">
-        <a href="./assets/Desing_Raju_Resume.pdf" class="btn btn-primary" download>Download CV</a>
-
-        <!-- hamburger for small screens -->
-        <div class="hamburger" style="margin-left:8px; position:relative">
-          <button id="hamburgerBtn" class="btn btn-ghost" aria-expanded="false" aria-controls="mobileMenu" title="Open menu">☰</button>
-          <div id="mobileMenu" class="menu-links" role="menu" aria-hidden="true">
-            <ul style="list-style:none; margin:0; padding:0;">
-              <li style="margin:8px 0"><a href="#about" onclick="closeMobile()">About</a></li>
-              <li style="margin:8px 0"><a href="#experience" onclick="closeMobile()">Experience</a></li>
-              <li style="margin:8px 0"><a href="#projects" onclick="closeMobile()">Projects</a></li>
-              <li style="margin:8px 0"><a href="#contact" onclick="closeMobile()">Contact</a></li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </div>
-  </header>
-
-  <main>
-    <!-- HERO -->
-    <section class="container hero" id="home" aria-labelledby="hero-heading">
-      <img src="./assets/profile-pic.png" alt="Desing Raju portrait" class="portrait" loading="lazy">
-
-      <div>
-        <p style="color:var(--muted); margin:0 0 6px">Hello, I'm</p>
-        <h1 id="hero-heading">Desing Raju Chavvakula</h1>
-        <p class="lead">Full Stack Python Developer — Django • REST • Frontend UI</p>
-
-        <div class="actions">
-          <a href="./assets/Desing_Raju_Resume.pdf" class="btn btn-primary" download>Download CV</a>
-          <a href="#contact" class="btn btn-ghost">Contact Info</a>
-        </div>
-
-        <div class="socials" style="margin-top:12px">
-          <a href="https://www.linkedin.com/in/desing-raju/" aria-label="LinkedIn" title="LinkedIn" style="display:inline-block; margin-right:8px">
-            <img src="./assets/linkedin.png" alt="LinkedIn" width="36" height="36">
-          </a>
-          <a href="https://github.com/desingraju" aria-label="GitHub" title="GitHub" style="display:inline-block">
-            <img src="./assets/github.png" alt="GitHub" width="36" height="36">
-          </a>
-        </div>
-      </div>
-    </section>
-
-    <!-- ABOUT -->
-    <section id="about" class="container" aria-labelledby="about-heading">
-      <h2 id="about-heading" class="section-title">About Me</h2>
-      <div class="about-grid">
-        <div class="about-photo">
-          <img src="./assets/about-pic.png" alt="Desing Raju working on laptop" loading="lazy" style="width:100%; height:100%; object-fit:cover;">
-        </div>
-
+      <div style="display:flex; align-items:center; gap:12px;">
         <div>
-          <div class="info-cards" role="list">
-            <div class="info-card" role="listitem">
+          <ul class="nav-links" style="display:flex; gap:14px; margin:0; padding:0;">
+            <li><a href="#about">About</a></li>
+            <li><a href="#experience">Experience</a></li>
+            <li><a href="#projects">Projects</a></li>
+            <li><a href="#contact">Contact</a></li>
+          </ul>
+        </div>
+
+        <!-- Theme toggle (desktop) -->
+        <button id="themeToggle" class="theme-toggle" aria-pressed="false" aria-label="Toggle dark mode">
+          <span id="themeIcon">🌙</span>
+          <span id="themeLabel" style="display:none">Toggle theme</span>
+        </button>
+      </div>
+    </nav>
+
+    <!-- Hamburger Nav -->
+    <nav id="hamburger-nav" style="padding:8px 20px; border-top:1px solid var(--border);">
+      <div style="display:flex; align-items:center; justify-content:space-between;">
+        <div class="logo">Desing Raju</div>
+        <div class="hamburger-menu">
+          <div class="hamburger-icon" onclick="toggleMenu()" role="button" aria-label="Open menu" style="cursor:pointer;">
+            <span style="display:block; width:22px; height:3px; background:var(--text); margin:4px 0;"></span>
+            <span style="display:block; width:22px; height:3px; background:var(--text); margin:4px 0;"></span>
+            <span style="display:block; width:22px; height:3px; background:var(--text); margin:4px 0;"></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="menu-links" id="mobileMenu" style="display:none; margin-top:10px;">
+        <li><a href="#about" onclick="toggleMenu()">About</a></li>
+        <li><a href="#experience" onclick="toggleMenu()">Experience</a></li>
+        <li><a href="#projects" onclick="toggleMenu()">Projects</a></li>
+        <li><a href="#contact" onclick="toggleMenu()">Contact</a></li>
+
+        <!-- Theme toggle (mobile menu) -->
+        <li style="margin-top:10px;">
+          <button id="themeToggleMobile" class="theme-toggle" aria-pressed="false" aria-label="Toggle dark mode (mobile)">
+            <span id="themeIconMobile">🌙</span>
+            <span style="margin-left:6px">Theme</span>
+          </button>
+        </li>
+      </div>
+    </nav>
+
+    <!-- Profile / Hero -->
+    <section id="profile">
+      <div class="section__pic-container">
+        <img src="./assets/profile-pic.png" alt="John Doe profile picture" />
+      </div>
+      <div class="section__text">
+        <p class="section__text__p1">Hello, I'm</p>
+        <h1 class="title">Desing Raju Chavvakula</h1>
+        <p class="section__text__p2">Full Stack Python Developer</p>
+        <div class="btn-container">
+          <button class="btn btn-color-2" onclick="window.open('./assets/Desing_Raju_Resume.pdf')">Download CV</button>
+          <button class="btn btn-color-1" onclick="location.href='./#contact'">Contact Info</button>
+        </div>
+        <div id="socials-container">
+          <img src="./assets/linkedin.png" alt="My LinkedIn profile" class="icon" onclick="location.href='https://www.linkedin.com/in/desing-raju/'" />
+          <img src="./assets/github.png" alt="My Github profile" class="icon" onclick="location.href='https://github.com/desingraju'" />
+        </div>
+      </div>
+    </section>
+
+    <!-- About -->
+    <section id="about">
+      <p class="section__text__p1">Get To Know More</p>
+      <h1 class="title">About Me</h1>
+      <div class="section-container">
+        <div class="section__pic-container">
+          <img src="./assets/about-pic.png" alt="Profile picture" class="about-pic" />
+        </div>
+        <div class="about-details-container">
+          <div class="about-containers">
+            <div class="details-container">
+              <img src="./assets/experience.png" alt="Experience icon" class="icon" />
               <h3>Experience</h3>
-              <div style="color:var(--muted)">1 year — Python Full Stack</div>
+              <p>1 year<br />Python Full Stack Development</p>
             </div>
-
-            <div class="info-card" role="listitem">
+            <div class="details-container">
+              <img src="./assets/education.png" alt="Education icon" class="icon" />
               <h3>Education</h3>
-              <div style="color:var(--muted)">B.Tech (Information Technology)</div>
+              <p>B.Tech Bachelors Degree<br />(Information Technology)</p>
+            </div>
+          </div>
+          <div class="text-container">
+            <p class="about-para">Aspiring Software Developer with strong foundational skills in Python, SQL, and full-stack web development. Enthusiastic and quick-learning developer with a solid academic background and hands-on internship experience in building end-to-end applications. Skilled in problem-solving, clean code practices, and efficient UI/UX design. Passionate about leveraging technology to create reliable and scalable solutions. A proactive team player with excellent communication skills, eager to contribute to innovative projects in a collaborative environment. Highly committed to continuous learning, professional growth, and adapting to new technologies.
+            </p>
+          </div>
+        </div>
+      </div>
+      <img src="./assets/arrow.png" alt="Arrow icon" class="icon arrow" onclick="location.href='./#experience'" />
+    </section>
+
+    <!-- Experience -->
+    <section id="experience">
+      <p class="section__text__p1">Explore My</p>
+      <h1 class="title">Experience</h1>
+      <div class="experience-details-container">
+        <div class="about-containers">
+          <div class="details-container">
+            <h2 class="experience-sub-title">Frontend Development</h2>
+            <div class="article-container">
+              <article>
+                <img src="./assets/checkmark.png" alt="Experience icon" class="icon" />
+                <div><h3>HTML</h3><p>Experienced</p></div>
+              </article>
+              <article>
+                <img src="./assets/checkmark.png" alt="Experience icon" class="icon" />
+                <div><h3>CSS</h3><p>Experienced</p></div>
+              </article>
+              <article>
+                <img src="./assets/checkmark.png" alt="Experience icon" class="icon" />
+                <div><h3>Bootstrap Framework</h3><p>Basic</p></div>
+              </article>
+              <article>
+                <img src="./assets/checkmark.png" alt="Experience icon" class="icon" />
+                <div><h3>Django Templates</h3><p>Intermediate</p></div>
+              </article>
             </div>
           </div>
 
-          <p class="about-para">Aspiring Software Developer with strong foundational skills in Python, SQL, and full-stack web development. Enthusiastic and quick-learning developer with a solid academic background and hands-on internship experience in building end-to-end applications. Skilled in problem-solving, clean code practices, and efficient UI/UX design. Passionate about leveraging technology to create reliable and scalable solutions. A proactive team player with excellent communication skills, eager to contribute to innovative projects in a collaborative environment. Highly committed to continuous learning, professional growth, and adapting to new technologies.</p>
+          <div class="details-container">
+            <h2 class="experience-sub-title">Backend Development</h2>
+            <div class="article-container">
+              <article>
+                <img src="./assets/checkmark.png" alt="Experience icon" class="icon" />
+                <div><h3>MYSQL</h3><p>Basic</p></div>
+              </article>
+              <article>
+                <img src="./assets/checkmark.png" alt="Experience icon" class="icon" />
+                <div><h3>Git</h3><p>Intermediate</p></div>
+              </article>
+              <article>
+                <img src="./assets/checkmark.png" alt="Experience icon" class="icon" />
+                <div><h3>Django</h3><p>Basic</p></div>
+              </article>
+              <article>
+                <img src="./assets/checkmark.png" alt="Experience icon" class="icon" />
+                <div><h3>Python</h3><p>Intermediate</p></div>
+              </article>
+            </div>
+          </div>
+        </div>
+      </div>
+      <img src="./assets/arrow.png" alt="Arrow icon" class="icon arrow" onclick="location.href='./#projects'" />
+    </section>
+
+    <!-- Projects -->
+    <section id="projects">
+      <p class="section__text__p1">Browse My Recent</p>
+      <h1 class="title">Projects</h1>
+      <div class="experience-details-container">
+        <div class="about-containers">
+          <div class="details-container color-container">
+            <div class="article-container">
+              <img src="./assets/project-1.png" alt="project-1" class="project-img" />
+            </div>
+            <h2 class="experience-sub-title project-title">MEAL PLANNER</h2>
+            <div class="btn-container">
+              <button class="btn btn-color-2 project-btn" onclick="location.href='https://desingraju.github.io/Mealplanner/'">Github</button>
+              <button class="btn btn-color-2 project-btn" onclick="location.href='https://github.com/'">Live Demo</button>
+            </div>
+          </div>
+
+          <div class="details-container color-container">
+            <div class="article-container">
+              <img src="./assets/project-2.png" alt="project-2" class="project-img" />
+            </div>
+            <h2 class="experience-sub-title project-title">YUMMY HUB</h2>
+            <div class="btn-container">
+              <button class="btn btn-color-2 project-btn" onclick="location.href='https://desingraju.github.io/Foodie_'">Github</button>
+              <button class="btn btn-color-2 project-btn" onclick="location.href='https://github.com/'">Live Demo</button>
+            </div>
+          </div>
+
+          <div class="details-container color-container">
+            <div class="article-container">
+              <img src="./assets/project-4.png" alt="project-4" class="project-img" />
+            </div>
+            <h2 class="experience-sub-title project-title">THE BIG-DAY</h2>
+            <div class="btn-container">
+              <button class="btn btn-color-2 project-btn" onclick="location.href='https://desingraju.github.io/TimerforEvent/'">Github</button>
+              <button class="btn btn-color-2 project-btn" onclick="location.href='https://github.com/'">Live Demo</button>
+            </div>
+          </div>
+
+          <div class="details-container color-container">
+            <div class="article-container">
+              <img src="./assets/project-7.png" alt="project-5" class="project-img" />
+            </div>
+            <h2 class="experience-sub-title project-title">TRAVEL YARI</h2>
+            <div class="btn-container">
+              <button class="btn btn-color-2 project-btn" onclick="location.href='https://desingraju.github.io/Travelyari/'">Github</button>
+              <button class="btn btn-color-2 project-btn" onclick="location.href='https://github.com/'">Live Demo</button>
+            </div>
+          </div>
+
+          <div class="details-container color-container">
+            <div class="article-container">
+              <img src="./assets/project-3.png" alt="project-2" class="project-img" />
+            </div>
+            <h2 class="experience-sub-title project-title">TRUST BANK</h2>
+            <div class="btn-container">
+              <button class="btn btn-color-2 project-btn" onclick="location.href='https://replit.com/@desingrajuchavv/Bank-Application?v=1'">Github</button>
+              <button class="btn btn-color-2 project-btn" onclick="location.href='https://github.com/'">Live Demo</button>
+            </div>
+          </div>
         </div>
       </div>
 
-      <div style="text-align:center; margin-top:14px">
-        <button class="btn btn-ghost" onclick="document.getElementById('experience').scrollIntoView({behavior:'smooth'})" aria-label="Go to experience">↓ Explore Experience</button>
+      <img src="./assets/arrow.png" alt="Arrow icon" class="icon arrow" onclick="location.href='./#contact'" />
+    </section>
+
+    <section>
+      <div class="experience-details-container">
+        <div class="about-containers">
+          <div class="details-container color-container">
+            <div class="article-container">
+              <img src="./assets/project-5.png" alt="project-4" class="project-img" />
+            </div>
+            <h2 class="experience-sub-title project-title">BUY BUDDY</h2>
+            <div class="btn-container">
+              <button class="btn btn-color-2 project-btn" onclick="location.href='https://replit.com/@desingrajuchavv/E-Commerce-Application?v=1'">Github</button>
+              <button class="btn btn-color-2 project-btn" onclick="location.href='https://github.com/'">Live Demo</button>
+            </div>
+          </div>
+
+          <div class="details-container color-container">
+            <div class="article-container">
+              <img src="./assets/project-6.png" alt="project-6" class="project-img" />
+            </div>
+            <h2 class="experience-sub-title project-title">BRAIN BUZZ</h2>
+            <div class="btn-container">
+              <button class="btn btn-color-2 project-btn" onclick="location.href='https://replit.com/@desingrajuchavv/Quiz-App?v=1'">Github</button>
+              <button class="btn btn-color-2 project-btn" onclick="location.href='https://github.com/'">Live Demo</button>
+            </div>
+          </div>
+
+          <div class="details-container color-container">
+            <div class="article-container">
+              <img src="./assets/project-8.png" alt="project-2" class="project-img" />
+            </div>
+            <h2 class="experience-sub-title project-title">STAFF INFO</h2>
+            <div class="btn-container">
+              <button class="btn btn-color-2 project-btn" onclick="location.href='https://edms1.pythonanywhere.com/'">Github</button>
+              <button class="btn btn-color-2 project-btn" onclick="location.href='https://github.com/'">Live Demo</button>
+            </div>
+          </div>
+
+          <div class="details-container color-container">
+            <div class="article-container">
+              <img src="./assets/project-10.png" alt="project-2" class="project-img" />
+            </div>
+            <h2 class="experience-sub-title project-title">CAMPUS CLOUD</h2>
+            <div class="btn-container">
+              <button class="btn btn-color-2 project-btn" onclick="location.href='https://raju.pythonanywhere.com/'">Github</button>
+              <button class="btn btn-color-2 project-btn" onclick="location.href='https://github.com/'">Live Demo</button>
+            </div>
+          </div>
+
+          <div class="details-container color-container">
+            <div class="article-container">
+              <img src="./assets/project-9.png" alt="project-2" class="project-img" />
+            </div>
+            <h2 class="experience-sub-title project-title">FORM TO CV</h2>
+            <div class="btn-container">
+              <button class="btn btn-color-2 project-btn" onclick="location.href='https://sendresume.pythonanywhere.com/'">Github</button>
+              <button class="btn btn-color-2 project-btn" onclick="location.href='https://github.com/'">Live Demo</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <img src="./assets/arrow.png" alt="Arrow icon" class="icon arrow" onclick="location.href='./#contact'" />
+    </section>
+
+    <!-- Contact (kept simple) -->
+    <section id="contact">
+      <p class="section__text__p1">Get in Touch</p>
+      <h1 class="title">Contact Me</h1>
+      <div class="contact-info-upper-container">
+        <div class="contact-info-container">
+          <img src="./assets/email.png" alt="Email icon" class="icon contact-icon email-icon" />
+          <p><a href="mailto:desingrajuchavvakula@gmail.com">desingrajuchavvakula@gmail.com</a></p>
+        </div>
+        <div class="contact-info-container">
+          <img src="./assets/linkedin.png" alt="LinkedIn icon" class="icon contact-icon" />
+          <p><a href="
+::contentReference[oaicite:0]{index=0}
+https://www.linkedin.com/in/desing-raju/">LinkedIn</a></p>
+        </div>
       </div>
     </section>
 
-    <!-- EXPERIENCE -->
-    <section id="experience" class="container" aria-labelledby="exp-heading" style="padding-top:1rem">
-      <h2 id="exp-heading" class="section-title">Experience</h2>
-
-      <div class="experience-wrap" role="list">
-        <div class="exp-card" role="listitem">
-          <h3>Frontend Development</h3>
-          <ul style="list-style:none; padding:0; margin-top:.5rem; color:var(--muted)">
-            <li>• HTML — Experienced</li>
-            <li>• CSS — Experienced</li>
-            <li>• Bootstrap Framework — Basic</li>
-            <li>• Django Templates — Intermediate</li>
+    <footer>
+      <nav>
+        <div class="nav-links-container">
+          <ul class="nav-links" style="display:flex; gap:12px;">
+            <li><a href="#about">About</a></li>
+            <li><a href="#experience">Experience</a></li>
+            <li><a href="#projects">Projects</a></li>
+            <li><a href="#contact">Contact</a></li>
           </ul>
         </div>
-
-        <div class="exp-card" role="listitem">
-          <h3>Backend Development</h3>
-          <ul style="list-style:none; padding:0; margin-top:.5rem; color:var(--muted)">
-            <li>• MySQL — Basic</li>
-            <li>• Git — Intermediate</li>
-            <li>• Django — Basic</li>
-            <li>• Python — Intermediate</li>
-          </ul>
-        </div>
-      </div>
-
-      <div style="text-align:center; margin-top:14px">
-        <button class="btn btn-ghost" onclick="document.getElementById('projects').scrollIntoView({behavior:'smooth'})" aria-label="Go to projects">↓ Browse Projects</button>
-      </div>
-    </section>
-
-    <!-- PROJECTS -->
-    <section id="projects" class="container" aria-labelledby="projects-heading">
-      <h2 id="projects-heading" class="section-title">Projects</h2>
-
-      <div class="projects-grid" role="list">
-        <!-- 1 CAMPUS CLOUD -->
-        <article class="project-card" role="listitem" aria-labelledby="proj-campus">
-          <div class="project-thumb">
-            <img src="./assets/project-10.png" alt="Campus Cloud screenshot" loading="lazy">
-          </div>
-          <div>
-            <div id="proj-campus" class="project-title">CAMPUS CLOUD</div>
-            <div class="project-desc">Student CRUD web app built with Django and Bootstrap.</div>
-            <div class="project-cta">
-              <button class="btn btn-ghost" onclick="window.open('https://github.com/your-repo','_blank')">Github</button>
-              <button class="btn btn-ghost" onclick="window.open('https://raju.pythonanywhere.com/','_blank')">Live Demo</button>
-            </div>
-          </div>
-        </article>
-
-        <!-- 2 MEAL PLANNER -->
-        <article class="project-card" role="listitem" aria-labelledby="proj-1">
-          <div class="project-thumb"><img src="./assets/project-1.png" alt="Meal Planner" loading="lazy"></div>
-          <div>
-            <div id="proj-1" class="project-title">MEAL PLANNER</div>
-            <div class="project-desc">Meal planning app with recipes.</div>
-            <div class="project-cta">
-              <button class="btn btn-ghost" onclick="window.open('https://desingraju.github.io/Mealplanner/','_blank')">Github</button>
-              <button class="btn btn-ghost" onclick="window.open('https://desingraju.github.io/Mealplanner/','_blank')">Live Demo</button>
-            </div>
-          </div>
-        </article>
-
-        <!-- 3 YUMMY HUB -->
-        <article class="project-card" role="listitem" aria-labelledby="proj-2">
-          <div class="project-thumb"><img src="./assets/project-2.png" alt="Yummy Hub" loading="lazy"></div>
-          <div>
-            <div id="proj-2" class="project-title">YUMMY HUB</div>
-            <div class="project-desc">Food ordering demo and UI examples.</div>
-            <div class="project-cta">
-              <button class="btn btn-ghost" onclick="window.open('https://desingraju.github.io/Foodie_','_blank')">Github</button>
-              <button class="btn btn-ghost" onclick="window.open('https://desingraju.github.io/Foodie_','_blank')">Live Demo</button>
-            </div>
-          </div>
-        </article>
-
-        <!-- 4 THE BIG-DAY -->
-        <article class="project-card" role="listitem" aria-labelledby="proj-3">
-          <div class="project-thumb"><img src="./assets/project-4.png" alt="The Big-Day" loading="lazy"></div>
-          <div>
-            <div id="proj-3" class="project-title">THE BIG-DAY</div>
-            <div class="project-desc">Event timer & countdown UI.</div>
-            <div class="project-cta">
-              <button class="btn btn-ghost" onclick="window.open('https://desingraju.github.io/TimerforEvent/','_blank')">Github</button>
-              <button class="btn btn-ghost" onclick="window.open('https://desingraju.github.io/TimerforEvent/','_blank')">Live Demo</button>
-            </div>
-          </div>
-        </article>
-
-        <!-- 5 TRAVEL YARI -->
-        <article class="project-card" role="listitem" aria-labelledby="proj-4">
-          <div class="project-thumb"><img src="./assets/project-7.png" alt="Travel Yari" loading="lazy"></div>
-          <div>
-            <div id="proj-4" class="project-title">TRAVEL YARI</div>
-            <div class="project-desc">Travel landing page and UI design.</div>
-            <div class="project-cta">
-              <button class="btn btn-ghost" onclick="window.open('https://desingraju.github.io/Travelyari/','_blank')">Github</button>
-              <button class="btn btn-ghost" onclick="window.open('https://desingraju.github.io/Travelyari/','_blank')">Live Demo</button>
-            </div>
-          </div>
-        </article>
-
-        <!-- 6 TRUST BANK -->
-        <article class="project-card" role="listitem" aria-labelledby="proj-5">
-          <div class="project-thumb"><img src="./assets/project-3.png" alt="Trust Bank" loading="lazy"></div>
-          <div>
-            <div id="proj-5" class="project-title">TRUST BANK</div>
-            <div class="project-desc">Banking app simulation and account operations.</div>
-            <div class="project-cta">
-              <button class="btn btn-ghost" onclick="window.open('https://replit.com/@desingrajuchavv/Bank-Application?v=1','_blank')">Github</button>
-              <button class="btn btn-ghost" onclick="window.open('https://replit.com/@desingrajuchavv/Bank-Application?v=1','_blank')">Live Demo</button>
-            </div>
-          </div>
-        </article>
-
-        <!-- 7 BUY BUDDY -->
-        <article class="project-card" role="listitem" aria-labelledby="proj-6">
-          <div class="project-thumb"><img src="./assets/project-5.png" alt="Buy Buddy" loading="lazy"></div>
-          <div>
-            <div id="proj-6" class="project-title">BUY BUDDY</div>
-            <div class="project-desc">E-commerce demo UI and interactions.</div>
-            <div class="project-cta">
-              <button class="btn btn-ghost" onclick="window.open('https://replit.com/@desingrajuchavv/E-Commerce-Application?v=1','_blank')">Github</button>
-              <button class="btn btn-ghost" onclick="window.open('https://replit.com/@desingrajuchavv/E-Commerce-Application?v=1','_blank')">Live Demo</button>
-            </div>
-          </div>
-        </article>
-
-        <!-- 8 BRAIN BUZZ -->
-        <article class="project-card" role="listitem" aria-labelledby="proj-7">
-          <div class="project-thumb"><img src="./assets/project-6.png" alt="Brain Buzz" loading="lazy"></div>
-          <div>
-            <div id="proj-7" class="project-title">BRAIN BUZZ</div>
-            <div class="project-desc">Quiz application with scoring mechanics.</div>
-            <div class="project-cta">
-              <button class="btn btn-ghost" onclick="window.open('https://replit.com/@desingrajuchavv/Quiz-App?v=1','_blank')">Github</button>
-              <button class="btn btn-ghost" onclick="window.open('https://replit.com/@desingrajuchavv/Quiz-App?v=1','_blank')">Live Demo</button>
-            </div>
-          </div>
-        </article>
-
-        <!-- 9 STAFF INFO -->
-        <article class="project-card" role="listitem" aria-labelledby="proj-8">
-          <div class="project-thumb"><img src="./assets/project-8.png" alt="Staff Info" loading="lazy"></div>
-          <div>
-            <div id="proj-8" class="project-title">STAFF INFO</div>
-            <div class="project-desc">Employee database management system (EDMS).</div>
-            <div class="project-cta">
-              <button class="btn btn-ghost" onclick="window.open('https://edms1.pythonanywhere.com/','_blank')">Live Demo</button>
-              <button class="btn btn-ghost" onclick="window.open('https://github.com/your-staffinfo-repo','_blank')">Github</button>
-            </div>
-          </div>
-        </article>
-
-        <!-- 10 FORM TO CV -->
-        <article class="project-card" role="listitem" aria-labelledby="proj-9">
-          <div class="project-thumb"><img src="./assets/project-9.png" alt="Form To CV" loading="lazy"></div>
-          <div>
-            <div id="proj-9" class="project-title">FORM TO CV</div>
-            <div class="project-desc">Resume form to CV generator and download.</div>
-            <div class="project-cta">
-              <button class="btn btn-ghost" onclick="window.open('https://sendresume.pythonanywhere.com/','_blank')">Live Demo</button>
-              <button class="btn btn-ghost" onclick="window.open('https://github.com/your-formtocv-repo','_blank')">Github</button>
-            </div>
-          </div>
-        </article>
-      </div>
-
-      <div style="text-align:center; margin-top:1.2rem">
-        <button class="btn btn-ghost" onclick="alert('Add pagination or a load-more feature to show additional projects')">Browse More Projects</button>
-      </div>
-
-    </section>
-
-    <!-- CONTACT (form removed) -->
-    <section id="contact" class="container" aria-labelledby="contact-heading" style="padding-top:2rem">
-      <h2 id="contact-heading" class="section-title">Contact Me</h2>
-
-      <div style="text-align:center; margin-top:0.6rem">
-        <p style="color:var(--muted); margin:0">Feel free to email or connect on LinkedIn.</p>
-
-        <div class="contact-links">
-          <div class="contact-pill">
-            <img src="./assets/email.png" alt="" width="18" height="18">
-            <a href="mailto:desingrajuchavvakula@gmail.com">desingrajuchavvakula@gmail.com</a>
-          </div>
-
-          <div class="contact-pill">
-            <img src="./assets/linkedin.png" alt="" width="18" height="18">
-            <a href="https://www.linkedin.com/in/desing-raju/" target="_blank" rel="noopener">LinkedIn</a>
-          </div>
-        </div>
-      </div>
-    </section>
-  </main>
-
-  <div id="toast" class="toast" role="status" aria-live="polite"></div>
-
-  <footer>
-    <div class="container" style="text-align:center">
-      <nav style="margin-bottom:1rem">
-        <a href="#about" style="margin-right:.7rem">About</a>
-        <a href="#experience" style="margin-right:.7rem">Experience</a>
-        <a href="#projects" style="margin-right:.7rem">Projects</a>
-        <a href="#contact">Contact</a>
       </nav>
-      <div style="color:var(--muted)">Copyright © <span id="yr"></span> Desing Raju. All Rights Reserved.</div>
-    </div>
-  </footer>
+      <p>Copyright &#169; 2025 Desing Raju. All Rights Reserved.</p>
+    </footer>
 
-  <script>
-    // set year
-    document.getElementById('yr').textContent = new Date().getFullYear();
+    <!-- ===== Script: theme toggle + mobile menu ===== -->
+    <script>
+      // mobile menu toggle (used by hamburger)
+      function toggleMenu() {
+        const m = document.getElementById('mobileMenu');
+        if (!m) return;
+        m.style.display = (m.style.display === 'block') ? 'none' : 'block';
+      }
 
-    // Smooth scroll for in-page links
-    document.querySelectorAll('a[href^="#"]').forEach(a => {
-      a.addEventListener('click', function(e){
-        const id = a.getAttribute('href');
-        const el = document.querySelector(id);
-        if(el){
-          e.preventDefault();
-          el.scrollIntoView({behavior:'smooth', block:'start'});
-          closeMobile();
+      // theme handling
+      const themeKey = 'site-theme'; // values: 'light'|'dark' or null
+      const htmlEl = document.documentElement;
+      const themeToggle = document.getElementById('themeToggle') || document.getElementById('themeToggleDesktop') || document.getElementById('themeToggle');
+      const themeToggleMobile = document.getElementById('themeToggleMobile');
+
+      // helper to set UI icons & aria
+      function updateToggleUI(isDark){
+        const icon = document.getElementById('themeIcon');
+        const iconMobile = document.getElementById('themeIconMobile');
+        if(icon) icon.textContent = isDark ? '☀️' : '🌙';
+        if(iconMobile) iconMobile.textContent = isDark ? '☀️' : '🌙';
+        if(themeToggle) themeToggle.setAttribute('aria-pressed', String(isDark));
+        if(themeToggleMobile) themeToggleMobile.setAttribute('aria-pressed', String(isDark));
+      }
+
+      // apply theme
+      function applyTheme(theme) {
+        if(theme === 'dark'){
+          htmlEl.classList.add('dark');
+          updateToggleUI(true);
+        } else {
+          htmlEl.classList.remove('dark');
+          updateToggleUI(false);
+        }
+      }
+
+      // toggle theme handler
+      function toggleTheme() {
+        const isDarkNow = htmlEl.classList.contains('dark');
+        const newTheme = isDarkNow ? 'light' : 'dark';
+        applyTheme(newTheme);
+        try { localStorage.setItem(themeKey, newTheme); } catch(e) {}
+      }
+
+      // initialize theme on page load
+      (function initTheme(){
+        const saved = (function(){ try{ return localStorage.getItem(themeKey) }catch(e){return null} })();
+        if(saved === 'dark' || saved === 'light'){
+          applyTheme(saved);
+        } else {
+          // respect OS preference if no saved choice
+          const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+          applyTheme(prefersDark ? 'dark' : 'light');
+        }
+      })();
+
+      // hook up buttons
+      document.getElementById('themeToggle')?.addEventListener('click', toggleTheme);
+      document.getElementById('themeToggleMobile')?.addEventListener('click', function(){
+        toggleTheme();
+        // also close menu for better UX
+        document.getElementById('mobileMenu').style.display = 'none';
+      });
+
+      // close mobile menu when clicking outside (optional nicety)
+      document.addEventListener('click', function(e){
+        const mobileMenu = document.getElementById('mobileMenu');
+        const hamburger = document.querySelector('.hamburger-icon');
+        if(!mobileMenu) return;
+        if(mobileMenu.style.display === 'block'){
+          if(!mobileMenu.contains(e.target) && !hamburger.contains(e.target)){
+            mobileMenu.style.display = 'none';
+          }
         }
       });
-    });
 
-    // Mobile menu
-    const hamburgerBtn = document.getElementById('hamburgerBtn');
-    const mobileMenu = document.getElementById('mobileMenu');
-    hamburgerBtn && hamburgerBtn.addEventListener('click', ()=> {
-      const open = mobileMenu.classList.toggle('open');
-      mobileMenu.setAttribute('aria-hidden', !open);
-      hamburgerBtn.setAttribute('aria-expanded', String(open));
-    });
-    function closeMobile(){
-      mobileMenu.classList.remove('open');
-      mobileMenu.setAttribute('aria-hidden', 'true');
-      hamburgerBtn.setAttribute('aria-expanded', 'false');
-    }
-
-    // accessibility: show focus styling for keyboard users
-    document.addEventListener('keyup', (e) => {
-      if(e.key === 'Tab') document.body.classList.add('user-tabbing');
-    });
-  </script>
-</body>
+      // optional: update theme if system preference changes (but keep saved preference)
+      window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+        const saved = (function(){ try{ return localStorage.getItem(themeKey) }catch(e){return null} })();
+        if(!saved){ applyTheme(e.matches ? 'dark' : 'light'); }
+      });
+    </script>
+  </body>
 </html>
